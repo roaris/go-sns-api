@@ -6,4 +6,7 @@ RUN mkdir /app
 
 WORKDIR /app
 
-COPY /app /app
+COPY ./app .
+
+RUN go get -u github.com/cosmtrek/air
+CMD ["air", "-c", ".air.toml"]
