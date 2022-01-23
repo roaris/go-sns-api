@@ -5,3 +5,16 @@ services:
     tty: true
     volumes:
       - ./app:/app
+  db:
+    image: mysql:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+    volumes:
+      - data-dev:/var/lib/mysql
+
+volumes:
+  data-dev:
+    driver: local
