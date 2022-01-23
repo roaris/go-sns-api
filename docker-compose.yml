@@ -9,6 +9,8 @@ services:
       - ./app:/app
   db:
     image: mysql:latest
+    ports:
+      - "3306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE
@@ -16,6 +18,7 @@ services:
       - MYSQL_PASSWORD
     volumes:
       - data-dev:/var/lib/mysql
+    container_name: db-container
 
 volumes:
   data-dev:
