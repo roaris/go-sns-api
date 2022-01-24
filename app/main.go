@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -17,6 +18,10 @@ type Post struct {
 	Content   string
 	CreatedAt time.Time
 	UpdatedAt time.Time
+}
+
+type PostRequest struct {
+	Content string
 }
 
 func main() {
@@ -41,6 +46,34 @@ func main() {
 	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("pong"))
+	})
+
+	http.HandleFunc("/api/v1/posts", func(w http.ResponseWriter, r *http.Request) {
+		// POSTリクエストのみ受け付ける
+		if r.Method != "POST" {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		// application/jsonのみ受け付ける
+		if r.Header.Get("Content-Type") != "application/json" {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		// リクエストボディをpostRequestに変換する
+		body := make([]byte, r.ContentLength)
+		r.Body.Read(body)
+		var postRequest PostRequest
+		json.Unmarshal(body, &postRequest)
+
+		post := Post{}
+		post.Content = postRequest.Content
+		err := db.Create(&post)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+		}
+		w.WriteHeader(http.StatusNoContent)
 	})
 
 	http.ListenAndServe(":8080", nil)
