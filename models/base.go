@@ -10,7 +10,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var DB *gorm.DB
+var db *gorm.DB
 
 func init() {
 	err := godotenv.Load(".env")
@@ -24,10 +24,10 @@ func init() {
 	mysqlPort := os.Getenv("MYSQL_PORT")
 	mysqlDatabase := os.Getenv("MYSQL_DATABASE")
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", mysqlUser, mysqlPassword, mysqlHost, mysqlPort, mysqlDatabase)
-	DB, err = gorm.Open("mysql", dsn)
+	db, err = gorm.Open("mysql", dsn)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	DB.AutoMigrate(&Post{}) // postsテーブルの作成
+	db.AutoMigrate(&Post{}) // postsテーブルの作成
 }

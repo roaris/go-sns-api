@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
@@ -22,10 +23,10 @@ func PostShow(w http.ResponseWriter, r *http.Request) {
 
 	// パスパラメータの取得
 	vars := mux.Vars(r)
-	id := vars["id"]
+	id, _ := strconv.Atoi(vars["id"])
 
-	post := models.Post{}
-	if err := models.DB.First(&post, "id=?", id).Error; gorm.IsRecordNotFoundError(err) {
+	post, err := models.ShowPost(id)
+	if gorm.IsRecordNotFoundError(err) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -56,8 +57,6 @@ func PostCreate(w http.ResponseWriter, r *http.Request) {
 	var postRequest PostRequest
 	json.Unmarshal(body, &postRequest)
 
-	post := models.Post{}
-	post.Content = postRequest.Content
-	models.DB.Create(&post)
+	models.CreatePost(postRequest.Content)
 	w.WriteHeader(http.StatusNoContent)
 }
