@@ -18,12 +18,12 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	mysql_user := os.Getenv("MYSQL_USER")
-	mysql_password := os.Getenv("MYSQL_PASSWORD")
-	mysql_host := os.Getenv("MYSQL_HOST")
-	mysql_port := os.Getenv("MYSQL_PORT")
-	mysql_database := os.Getenv("MYSQL_DATABASE")
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", mysql_user, mysql_password, mysql_host, mysql_port, mysql_database)
+	mysqlUser := os.Getenv("MYSQL_USER")
+	mysqlPassword := os.Getenv("MYSQL_PASSWORD")
+	mysqlHost := os.Getenv("MYSQL_HOST")
+	mysqlPort := os.Getenv("MYSQL_PORT")
+	mysqlDatabase := os.Getenv("MYSQL_DATABASE")
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", mysqlUser, mysqlPassword, mysqlHost, mysqlPort, mysqlDatabase)
 	_, err = sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatalln(err)
