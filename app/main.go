@@ -1,15 +1,14 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/joho/godotenv"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
@@ -24,7 +23,7 @@ func main() {
 	mysqlPort := os.Getenv("MYSQL_PORT")
 	mysqlDatabase := os.Getenv("MYSQL_DATABASE")
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", mysqlUser, mysqlPassword, mysqlHost, mysqlPort, mysqlDatabase)
-	_, err = sql.Open("mysql", dsn)
+	_, err = gorm.Open("mysql", dsn)
 	if err != nil {
 		log.Fatalln(err)
 	}
