@@ -6,7 +6,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./app:/app
+      - .:/app # ボリュームマウント
   db:
     image: mysql:latest
     ports:
