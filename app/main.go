@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/joho/godotenv"
@@ -43,12 +44,14 @@ func main() {
 
 	db.AutoMigrate(&Post{}) // postsテーブルの作成
 
-	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
+	router := mux.NewRouter()
+
+	router.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("pong"))
 	})
 
-	http.HandleFunc("/api/v1/posts", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/api/v1/posts", func(w http.ResponseWriter, r *http.Request) {
 		// POSTリクエストのみ受け付ける
 		if r.Method != "POST" {
 			w.WriteHeader(http.StatusNotFound)
@@ -69,12 +72,9 @@ func main() {
 
 		post := Post{}
 		post.Content = postRequest.Content
-		err := db.Create(&post)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-		}
+		db.Create(&post)
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8080", router)
 }
