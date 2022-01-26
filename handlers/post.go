@@ -57,6 +57,11 @@ func PostCreate(w http.ResponseWriter, r *http.Request) {
 	var postRequest PostRequest
 	json.Unmarshal(body, &postRequest)
 
-	models.CreatePost(postRequest.Content)
+	err := models.CreatePost(postRequest.Content)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	w.WriteHeader(http.StatusNoContent)
 }
