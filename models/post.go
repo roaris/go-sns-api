@@ -29,3 +29,19 @@ func CreatePost(content string) (err error) {
 	db.Create(&post)
 	return err
 }
+
+func UpdatePost(id int, content string) (err error) {
+	post, err := ShowPost(id)
+	if err != nil {
+		return err
+	}
+	postAfter := post
+	postAfter.Content = content
+	validate := validator.New()
+	err = validate.Struct(postAfter)
+	if err != nil {
+		return err
+	}
+	db.Model(&post).Updates(postAfter)
+	return nil
+}
