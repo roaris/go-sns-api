@@ -27,7 +27,7 @@ func CreatePost(content string) (err error) {
 		return err
 	}
 	db.Create(&post)
-	return err
+	return nil
 }
 
 func UpdatePost(id int, content string) (err error) {
