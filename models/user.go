@@ -42,3 +42,8 @@ func CreateUser(name string, email string, password string) (err error) {
 	}
 	return nil
 }
+
+func GetUserByEmail(email string) (user User, err error) {
+	err = db.First(&user, "email=?", email).Error
+	return user, err
+}
