@@ -8,12 +8,14 @@ import (
 )
 
 func main() {
-	router := mux.NewRouter()
-	router.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
+	r := mux.NewRouter()
+	r.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("pong"))
 	})
-	router.HandleFunc("/api/v1/posts/{id:[0-9]+}", handlers.PostShow)
-	router.HandleFunc("/api/v1/posts", handlers.PostCreate)
-	http.ListenAndServe(":8080", router)
+
+	v1r := r.PathPrefix("/api/v1").Subrouter()
+	v1r.Methods(http.MethodGet).Path("/posts/{id:[0-9]+}").HandlerFunc(handlers.PostShow)
+	v1r.Methods(http.MethodPost).Path("/posts").HandlerFunc(handlers.PostCreate)
+	http.ListenAndServe(":8080", r)
 }

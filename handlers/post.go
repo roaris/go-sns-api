@@ -15,12 +15,6 @@ type PostRequest struct {
 }
 
 func PostShow(w http.ResponseWriter, r *http.Request) {
-	// GETリクエストのみ受け付ける
-	if r.Method != "GET" {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
 	// パスパラメータの取得
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])
@@ -39,12 +33,6 @@ func PostShow(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostCreate(w http.ResponseWriter, r *http.Request) {
-	// POSTリクエストのみ受け付ける
-	if r.Method != "POST" {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
 	// application/jsonのみ受け付ける
 	if r.Header.Get("Content-Type") != "application/json" {
 		w.WriteHeader(http.StatusBadRequest)
