@@ -78,3 +78,17 @@ func PostUpdate(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func PostDelete(w http.ResponseWriter, r *http.Request) {
+	// パスパラメータの取得
+	vars := mux.Vars(r)
+	id, _ := strconv.Atoi(vars["id"])
+
+	err := models.DeletePost(id)
+	if gorm.IsRecordNotFoundError(err) {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}

@@ -18,5 +18,6 @@ func main() {
 	v1r.Methods(http.MethodGet).Path("/posts/{id:[0-9]+}").HandlerFunc(handlers.PostShow)
 	v1r.Methods(http.MethodPost).Path("/posts").HandlerFunc(handlers.PostCreate)
 	v1r.Methods(http.MethodPatch).Path("/posts/{id:[0-9]+}").HandlerFunc(handlers.PostUpdate)
+	v1r.Methods(http.MethodDelete).Path("/posts/{id:[0-9]+}").HandlerFunc(handlers.PostDelete)
 	http.ListenAndServe(":8080", r)
 }

@@ -45,3 +45,12 @@ func UpdatePost(id int, content string) (err error) {
 	db.Model(&post).Updates(postAfter)
 	return nil
 }
+
+func DeletePost(id int) (err error) {
+	post, err := ShowPost(id)
+	if err != nil {
+		return err
+	}
+	db.Delete(&post)
+	return nil
+}
