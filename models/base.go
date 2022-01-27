@@ -30,4 +30,5 @@ func init() {
 	}
 
 	db.AutoMigrate(&Post{}) // postsテーブルの作成
+	db.AutoMigrate(&User{}) // usersテーブルの作成
 }
