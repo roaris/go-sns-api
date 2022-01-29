@@ -1,8 +1,8 @@
 package middlewares
 
 import (
+	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 
@@ -52,8 +52,7 @@ func AuthMiddleware(handler http.HandlerFunc) http.HandlerFunc {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		fmt.Println(userID)
-		// todo: userIDをContextにセットする
-		handler(w, r)
+		ctx := context.WithValue(r.Context(), "userID", userID)
+		handler(w, r.WithContext(ctx))
 	}
 }

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"time"
 
 	"gopkg.in/go-playground/validator.v9"
@@ -10,7 +11,7 @@ type Post struct {
 	ID        int       `json:"id"`
 	Content   string    `json:"content" validate:"required,max=140"`
 	UserID    int       `json:"user_id" validate:"required"`
-	User      User
+	User      User      `validate:"-"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -20,8 +21,9 @@ func ShowPost(id int) (post Post, err error) {
 	return post, err
 }
 
-func CreatePost(content string) (err error) {
+func CreatePost(userID int, content string) (err error) {
 	post := Post{}
+	post.UserID = userID
 	post.Content = content
 	validate := validator.New()
 	err = validate.Struct(post)
@@ -32,10 +34,13 @@ func CreatePost(content string) (err error) {
 	return nil
 }
 
-func UpdatePost(id int, content string) (err error) {
+func UpdatePost(id int, userID int, content string) (err error) {
 	post, err := ShowPost(id)
 	if err != nil {
 		return err
+	}
+	if post.UserID != userID {
+		return errors.New("forbidden update")
 	}
 	postAfter := post
 	postAfter.Content = content
@@ -48,10 +53,13 @@ func UpdatePost(id int, content string) (err error) {
 	return nil
 }
 
-func DeletePost(id int) (err error) {
+func DeletePost(id int, userID int) (err error) {
 	post, err := ShowPost(id)
 	if err != nil {
 		return err
+	}
+	if post.UserID != userID {
+		return errors.New("forbidden delete")
 	}
 	db.Delete(&post)
 	return nil

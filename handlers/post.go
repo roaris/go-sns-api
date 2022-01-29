@@ -46,7 +46,7 @@ func PostCreate(w http.ResponseWriter, r *http.Request) {
 	var postRequest PostRequest
 	json.Unmarshal(body, &postRequest)
 
-	err := models.CreatePost(postRequest.Content)
+	err := models.CreatePost(r.Context().Value("userID").(int), postRequest.Content)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -66,13 +66,16 @@ func PostUpdate(w http.ResponseWriter, r *http.Request) {
 	var postRequest PostRequest
 	json.Unmarshal(body, &postRequest)
 
-	err := models.UpdatePost(id, postRequest.Content)
+	err := models.UpdatePost(id, r.Context().Value("userID").(int), postRequest.Content)
 
 	if gorm.IsRecordNotFoundError(err) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	} else if _, ok := err.(validator.ValidationErrors); ok {
 		w.WriteHeader(http.StatusBadRequest)
+		return
+	} else if err != nil && err.Error() == "forbidden update" {
+		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 
@@ -84,9 +87,12 @@ func PostDelete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])
 
-	err := models.DeletePost(id)
+	err := models.DeletePost(id, r.Context().Value("userID").(int))
 	if gorm.IsRecordNotFoundError(err) {
 		w.WriteHeader(http.StatusNotFound)
+		return
+	} else if err != nil && err.Error() == "forbidden update" {
+		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 
