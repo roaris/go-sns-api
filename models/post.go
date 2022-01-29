@@ -9,6 +9,8 @@ import (
 type Post struct {
 	ID        int       `json:"id"`
 	Content   string    `json:"content" validate:"required,max=140"`
+	UserID    int       `json:"user_id" validate:"required"`
+	User      User
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
