@@ -1,10 +1,11 @@
 package middlewares
 
 import (
-	"context"
 	"errors"
 	"net/http"
 	"os"
+
+	"github.com/roaris/go_sns_api/httputils"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -52,7 +53,7 @@ func AuthMiddleware(handler http.HandlerFunc) http.HandlerFunc {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		ctx := context.WithValue(r.Context(), "userID", userID)
+		ctx := httputils.SetUserIDToContext(r.Context(), userID)
 		handler(w, r.WithContext(ctx))
 	}
 }

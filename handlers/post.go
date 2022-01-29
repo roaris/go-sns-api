@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
+	"github.com/roaris/go_sns_api/httputils"
 	"github.com/roaris/go_sns_api/models"
 	"gopkg.in/go-playground/validator.v9"
 )
@@ -46,7 +47,8 @@ func PostCreate(w http.ResponseWriter, r *http.Request) {
 	var postRequest PostRequest
 	json.Unmarshal(body, &postRequest)
 
-	err := models.CreatePost(r.Context().Value("userID").(int), postRequest.Content)
+	userID := httputils.GetUserIDFromContext(r.Context())
+	err := models.CreatePost(userID, postRequest.Content)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -66,7 +68,8 @@ func PostUpdate(w http.ResponseWriter, r *http.Request) {
 	var postRequest PostRequest
 	json.Unmarshal(body, &postRequest)
 
-	err := models.UpdatePost(id, r.Context().Value("userID").(int), postRequest.Content)
+	userID := httputils.GetUserIDFromContext(r.Context())
+	err := models.UpdatePost(id, userID, postRequest.Content)
 
 	if gorm.IsRecordNotFoundError(err) {
 		w.WriteHeader(http.StatusNotFound)
@@ -87,7 +90,8 @@ func PostDelete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])
 
-	err := models.DeletePost(id, r.Context().Value("userID").(int))
+	userID := httputils.GetUserIDFromContext(r.Context())
+	err := models.DeletePost(id, userID)
 	if gorm.IsRecordNotFoundError(err) {
 		w.WriteHeader(http.StatusNotFound)
 		return
