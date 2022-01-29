@@ -29,6 +29,6 @@ func init() {
 		log.Fatalln(err)
 	}
 
-	db.AutoMigrate(&Post{}) // postsテーブルの作成
 	db.AutoMigrate(&User{}) // usersテーブルの作成
+	db.AutoMigrate(&Post{}).AddForeignKey("user_id", "users(id)", "CASCADE", "RESTRICT") // postsテーブルの作成, 対応するuserが削除されたらpostも削除される(CASCADE), user_idの更新は認めない(RESTRICT)
 }

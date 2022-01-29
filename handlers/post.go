@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
+	"github.com/roaris/go_sns_api/httputils"
 	"github.com/roaris/go_sns_api/models"
 	"gopkg.in/go-playground/validator.v9"
 )
@@ -46,7 +47,8 @@ func PostCreate(w http.ResponseWriter, r *http.Request) {
 	var postRequest PostRequest
 	json.Unmarshal(body, &postRequest)
 
-	err := models.CreatePost(postRequest.Content)
+	userID := httputils.GetUserIDFromContext(r.Context())
+	err := models.CreatePost(userID, postRequest.Content)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -66,13 +68,17 @@ func PostUpdate(w http.ResponseWriter, r *http.Request) {
 	var postRequest PostRequest
 	json.Unmarshal(body, &postRequest)
 
-	err := models.UpdatePost(id, postRequest.Content)
+	userID := httputils.GetUserIDFromContext(r.Context())
+	err := models.UpdatePost(id, userID, postRequest.Content)
 
 	if gorm.IsRecordNotFoundError(err) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	} else if _, ok := err.(validator.ValidationErrors); ok {
 		w.WriteHeader(http.StatusBadRequest)
+		return
+	} else if err != nil && err.Error() == "forbidden update" {
+		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 
@@ -84,9 +90,13 @@ func PostDelete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])
 
-	err := models.DeletePost(id)
+	userID := httputils.GetUserIDFromContext(r.Context())
+	err := models.DeletePost(id, userID)
 	if gorm.IsRecordNotFoundError(err) {
 		w.WriteHeader(http.StatusNotFound)
+		return
+	} else if err != nil && err.Error() == "forbidden delete" {
+		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 

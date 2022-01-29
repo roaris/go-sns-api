@@ -14,6 +14,7 @@ type User struct {
 	Name      string    `json:"name" validate:"required,min=3"`
 	Email     string    `json:"email" validate:"required,email" gorm:"unique_index"`
 	Password  string    `json:"password" validate:"required"`
+	Posts     []Post
 	CreatedAt time.Time `json:"created_at"`
 }
 
