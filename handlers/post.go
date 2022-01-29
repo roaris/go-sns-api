@@ -95,7 +95,7 @@ func PostDelete(w http.ResponseWriter, r *http.Request) {
 	if gorm.IsRecordNotFoundError(err) {
 		w.WriteHeader(http.StatusNotFound)
 		return
-	} else if err != nil && err.Error() == "forbidden update" {
+	} else if err != nil && err.Error() == "forbidden delete" {
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
