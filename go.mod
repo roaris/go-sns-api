@@ -10,6 +10,7 @@ require (
 	github.com/jinzhu/gorm v1.9.16 // indirect
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
+	github.com/rs/cors v1.8.2 // indirect
 	golang.org/x/crypto v0.0.0-20220126234351-aa10faf2a1f8 // indirect
 	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect
 )
