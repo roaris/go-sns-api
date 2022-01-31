@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/roaris/go_sns_api/httputils"
+	"github.com/roaris/go-sns-api/httputils"
 
 	"github.com/dgrijalva/jwt-go"
 )

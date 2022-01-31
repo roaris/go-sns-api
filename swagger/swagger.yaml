@@ -1,10 +1,10 @@
 swagger: '2.0'
 info:
-  title: go_sns_api
+  title: go-sns-api
   description: ''
   contact:
     name: roaris
-    url: 'https://github.com/roaris/go_sns_api'
+    url: 'https://github.com/roaris/go-sns-api'
 host: 'localhost:8080'
 basePath: /api/v1
 securityDefinitions:

@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/roaris/go_sns_api/models"
+	"github.com/roaris/go-sns-api/models"
 	"gopkg.in/go-playground/validator.v9"
 )
 

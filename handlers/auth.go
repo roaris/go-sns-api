@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/roaris/go_sns_api/models"
+	"github.com/roaris/go-sns-api/models"
 	"golang.org/x/crypto/bcrypt"
 )
 

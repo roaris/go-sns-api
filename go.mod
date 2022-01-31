@@ -1,4 +1,4 @@
-module github.com/roaris/go_sns_api
+module github.com/roaris/go-sns-api
 
 go 1.16
 

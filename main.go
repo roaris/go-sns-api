@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/roaris/go_sns_api/handlers"
-	"github.com/roaris/go_sns_api/middlewares"
+	"github.com/roaris/go-sns-api/handlers"
+	"github.com/roaris/go-sns-api/middlewares"
 	"github.com/rs/cors"
 )
 

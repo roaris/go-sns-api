@@ -7,8 +7,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
-	"github.com/roaris/go_sns_api/httputils"
-	"github.com/roaris/go_sns_api/models"
+	"github.com/roaris/go-sns-api/httputils"
+	"github.com/roaris/go-sns-api/models"
 	"gopkg.in/go-playground/validator.v9"
 )
 

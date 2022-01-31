@@ -1,4 +1,4 @@
-# go_sns_api
+# go-sns-api
 
 ## 動作環境
 ```
@@ -8,8 +8,8 @@ Docker version 20.10.12, build e91ed57
 
 ## 検証環境(docker-compose)
 ```
-git clone https://github.com/roaris/go_sns_api
-cd go_sns_api
+git clone https://github.com/roaris/go-sns-api
+cd go-sns-api
 docker-compose build
 docker-compose up
 ```
