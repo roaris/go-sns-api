@@ -1,0 +1,209 @@
+swagger: '2.0'
+info:
+  title: go_sns_api
+  description: ''
+  contact:
+    name: roaris
+    url: 'https://github.com/roaris/go_sns_api'
+host: 'localhost:8080'
+basePath: /api/v1
+securityDefinitions:
+  Authorization:
+    name: Authorization
+    type: apiKey
+    in: header
+paths:
+  '/posts/{post_id}':
+    get:
+      summary: ''
+      tags:
+        - Post
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              content:
+                type: string
+              user_id:
+                type: integer
+              created_at:
+                type: string
+              updated_at:
+                type: string
+          examples: {}
+        '404':
+          description: Not Found
+          schema:
+            type: object
+            properties: {}
+      operationId: get-posts
+      description: 投稿取得
+      parameters: []
+    parameters:
+      - type: string
+        name: post_id
+        in: path
+        required: true
+    patch:
+      summary: ''
+      operationId: patch-posts-post_id
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          schema:
+            type: object
+            properties: {}
+        '401':
+          description: Unauthorized
+          schema:
+            type: object
+            properties: {}
+        '403':
+          description: Forbidden
+          schema:
+            type: object
+            properties: {}
+        '404':
+          description: Not Found
+          schema:
+            type: object
+            properties: {}
+      description: 投稿編集
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              content:
+                type: string
+      security:
+        - Authorization: []
+      tags:
+        - Post
+    delete:
+      summary: ''
+      operationId: delete-posts-post_id
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+          schema:
+            type: object
+            properties: {}
+        '403':
+          description: Forbidden
+          schema:
+            type: object
+            properties: {}
+        '404':
+          description: Not Found
+          schema:
+            type: object
+            properties: {}
+      description: 投稿削除
+      security:
+        - Authorization: []
+      tags:
+        - Post
+  /posts:
+    post:
+      summary: ''
+      operationId: post-posts
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          schema:
+            type: object
+            properties: {}
+      description: 投稿作成
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              content:
+                type: string
+          description: ''
+      tags:
+        - Post
+      security:
+        - Authorization: []
+  /auth:
+    post:
+      summary: ''
+      operationId: post-auth
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+        '400':
+          description: Bad Request
+          schema: {}
+        '401':
+          description: Unauthorized
+          schema: {}
+      description: ログイン JWTトークンを返す
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+              password:
+                type: string
+          x-examples:
+            example-1:
+              email: strng
+              password: string
+          description: ''
+      tags:
+        - User
+  /users:
+    post:
+      summary: ''
+      operationId: post-users
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          schema: {}
+        '409':
+          description: Conflict
+          schema: {}
+      description: 新規登録
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              email:
+                type: string
+              password:
+                type: string
+          x-examples: {}
+          description: ''
+      tags:
+        - User
+schemes:
+  - http

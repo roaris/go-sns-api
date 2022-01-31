@@ -19,6 +19,14 @@ services:
     volumes:
       - data-dev:/var/lib/mysql
     container_name: db-container
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    environment:
+      - SWAGGER_JSON=/swagger/swagger.yaml
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./swagger:/swagger
 
 volumes:
   data-dev:
