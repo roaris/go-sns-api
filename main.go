@@ -19,7 +19,7 @@ func main() {
 	// CORSの設定
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
-		AllowedHeaders: []string{"Authorization", "Accept-Language", "Content-Type", "Content-Language", "Origin"},
+		AllowedHeaders: []string{"*"},
 		AllowedMethods: []string{
 			http.MethodOptions,
 			http.MethodHead,
