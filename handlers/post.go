@@ -30,7 +30,7 @@ func PostShow(w http.ResponseWriter, r *http.Request) {
 	// header → status code → response body の順番にしないと無効になる
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	res, _ := json.Marshal(post)
+	res, _ := json.Marshal(post.SwaggerModel())
 	w.Write(res)
 }
 

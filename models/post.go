@@ -4,6 +4,8 @@ import (
 	"errors"
 	"time"
 
+	"github.com/go-openapi/strfmt"
+	"github.com/roaris/go-sns-api/swagger/gen"
 	"gopkg.in/go-playground/validator.v9"
 )
 
@@ -14,6 +16,16 @@ type Post struct {
 	User      *User     `json:"user,omitempty" validate:"-"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+}
+
+func (p *Post) SwaggerModel() *gen.Post {
+	return &gen.Post{
+		ID:        p.ID,
+		Content:   p.Content,
+		UserID:    p.UserID,
+		CreatedAt: strfmt.DateTime(p.CreatedAt),
+		UpdatedAt: strfmt.DateTime(p.UpdatedAt),
+	}
 }
 
 func ShowPost(id int64) (post Post, err error) {
