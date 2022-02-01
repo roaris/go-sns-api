@@ -1,16 +1,20 @@
 package httputils
 
-import "context"
+import (
+	"context"
+
+	"github.com/roaris/go-sns-api/models"
+)
 
 type contextKey string
 
-const userIDContextKey contextKey = "userID"
+const userContextKey contextKey = "user"
 
-func SetUserIDToContext(ctx context.Context, userID int64) context.Context {
-	return context.WithValue(ctx, userIDContextKey, userID)
+func SetUserToContext(ctx context.Context, user models.User) context.Context {
+	return context.WithValue(ctx, userContextKey, user)
 }
 
-func GetUserIDFromContext(ctx context.Context) int64 {
-	userID := ctx.Value(userIDContextKey)
-	return userID.(int64)
+func GetUserFromContext(ctx context.Context) models.User {
+	user := ctx.Value(userContextKey)
+	return user.(models.User)
 }

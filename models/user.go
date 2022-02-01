@@ -31,6 +31,11 @@ func Encrypt(password string) string {
 	return string(hash)
 }
 
+func ShowUser(id int64) (user User, err error) {
+	err = db.First(&user, "id=?", id).Error
+	return user, err
+}
+
 func CreateUser(name string, email string, password string) (user User, err error) {
 	if utf8.RuneCountInString(password) < 6 {
 		err = errors.New("too short password")
