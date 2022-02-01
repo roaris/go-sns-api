@@ -30,6 +30,9 @@ func (p *Post) SwaggerModel() *gen.Post {
 
 func ShowPost(id int64) (post Post, err error) {
 	err = db.First(&post, "id=?", id).Error
+	if err != nil {
+		return post, err
+	}
 	var user User
 	db.Model(&post).Association("User").Find(&user)
 	post.User = &user
