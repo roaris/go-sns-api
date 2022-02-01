@@ -21,7 +21,7 @@ type Token struct {
 }
 
 // JWTトークンを生成する
-func GenerateToken(userID int, now time.Time) (string, error) {
+func GenerateToken(userID int64, now time.Time) (string, error) {
 	/*
 		HMAC SHA-256を使用 sub(subject):識別子 iat(issued at):発行時刻 exp(expiration):有効期限
 		iatとexpはUNIXタイムスタンプを使う

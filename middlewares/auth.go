@@ -25,7 +25,7 @@ func getTokenFromHeader(r *http.Request) (string, error) {
 }
 
 // JWTトークンの検証を行う
-func parseToken(signedString string) (int, error) {
+func parseToken(signedString string) (int64, error) {
 	token, err := jwt.Parse(signedString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("unexpected signing method")
@@ -37,7 +37,7 @@ func parseToken(signedString string) (int, error) {
 	}
 	claims := token.Claims.(jwt.MapClaims)
 	userID := claims["sub"].(float64)
-	return int(userID), err
+	return int64(userID), err
 }
 
 // JWTトークンの検証を行うミドルウェア

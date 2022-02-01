@@ -10,10 +10,10 @@ import (
 )
 
 type User struct {
-	ID        int       `json:"id"`
-	Name      string    `json:"name" validate:"required,min=3"`
-	Email     string    `json:"email" validate:"required,email" gorm:"unique_index"`
-	Password  string    `json:"password" validate:"required"`
+	ID        int64  `json:"id"`
+	Name      string `json:"name" validate:"required,min=3"`
+	Email     string `json:"email" validate:"required,email" gorm:"unique_index"`
+	Password  string `json:"password" validate:"required"`
 	Posts     []Post
 	CreatedAt time.Time `json:"created_at"`
 }

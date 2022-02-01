@@ -19,7 +19,7 @@ type PostRequest struct {
 func PostShow(w http.ResponseWriter, r *http.Request) {
 	// パスパラメータの取得
 	vars := mux.Vars(r)
-	id, _ := strconv.Atoi(vars["id"])
+	id, _ := strconv.ParseInt(vars["id"], 10, 64)
 
 	post, err := models.ShowPost(id)
 	if gorm.IsRecordNotFoundError(err) {
@@ -60,7 +60,7 @@ func PostCreate(w http.ResponseWriter, r *http.Request) {
 func PostUpdate(w http.ResponseWriter, r *http.Request) {
 	// パスパラメータの取得
 	vars := mux.Vars(r)
-	id, _ := strconv.Atoi(vars["id"])
+	id, _ := strconv.ParseInt(vars["id"], 10, 64)
 
 	// リクエストボディをPostRequestに変換する
 	body := make([]byte, r.ContentLength)
@@ -88,7 +88,7 @@ func PostUpdate(w http.ResponseWriter, r *http.Request) {
 func PostDelete(w http.ResponseWriter, r *http.Request) {
 	// パスパラメータの取得
 	vars := mux.Vars(r)
-	id, _ := strconv.Atoi(vars["id"])
+	id, _ := strconv.ParseInt(vars["id"], 10, 64)
 
 	userID := httputils.GetUserIDFromContext(r.Context())
 	err := models.DeletePost(id, userID)
