@@ -28,7 +28,7 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 	var userRequest UserRequest
 	json.Unmarshal(body, &userRequest)
 
-	err := models.CreateUser(userRequest.Name, userRequest.Email, userRequest.Password)
+	user, err := models.CreateUser(userRequest.Name, userRequest.Email, userRequest.Password)
 	if _, ok := err.(validator.ValidationErrors); ok {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -40,5 +40,7 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
+	res, _ := json.Marshal(user.SwaggerModel())
+	w.Write(res)
 }

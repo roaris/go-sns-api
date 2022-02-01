@@ -214,3 +214,11 @@ definitions:
       updated_at:
         type: string
         format: date-time
+  User:
+    title: User
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string

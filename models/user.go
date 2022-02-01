@@ -5,6 +5,7 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/roaris/go-sns-api/swagger/gen"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/validator.v9"
 )
@@ -18,30 +19,36 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+func (u *User) SwaggerModel() *gen.User {
+	return &gen.User{
+		ID:   u.ID,
+		Name: u.Name,
+	}
+}
+
 func Encrypt(password string) string {
 	hash, _ := bcrypt.GenerateFromPassword([]byte(password), 12)
 	return string(hash)
 }
 
-func CreateUser(name string, email string, password string) (err error) {
+func CreateUser(name string, email string, password string) (user User, err error) {
 	if utf8.RuneCountInString(password) < 6 {
 		err = errors.New("too short password")
-		return err
+		return user, err
 	}
-	user := User{}
 	user.Name = name
 	user.Email = email
 	user.Password = Encrypt(password)
 	validate := validator.New()
 	err = validate.Struct(user)
 	if err != nil {
-		return err
+		return user, err
 	}
 	err = db.Create(&user).Error
 	if err != nil {
-		return err
+		return user, err
 	}
-	return nil
+	return user, nil
 }
 
 func GetUserByEmail(email string) (user User, err error) {
