@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/roaris/go-sns-api/httputils"
-	"github.com/roaris/go-sns-api/models"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -54,8 +53,7 @@ func AuthMiddleware(handler http.HandlerFunc) http.HandlerFunc {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		user, _ := models.ShowUser(userID)
-		ctx := httputils.SetUserToContext(r.Context(), user)
+		ctx := httputils.SetUserIDToContext(r.Context(), userID)
 		handler(w, r.WithContext(ctx))
 	}
 }

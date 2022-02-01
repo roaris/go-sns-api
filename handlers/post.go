@@ -51,8 +51,8 @@ func PostCreate(w http.ResponseWriter, r *http.Request) {
 	var postRequest PostRequest
 	json.Unmarshal(body, &postRequest)
 
-	user := httputils.GetUserFromContext(r.Context())
-	post, err := models.CreatePost(user.ID, postRequest.Content)
+	userID := httputils.GetUserIDFromContext(r.Context())
+	post, err := models.CreatePost(userID, postRequest.Content)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -74,8 +74,8 @@ func PostUpdate(w http.ResponseWriter, r *http.Request) {
 	var postRequest PostRequest
 	json.Unmarshal(body, &postRequest)
 
-	user := httputils.GetUserFromContext(r.Context())
-	post, err := models.UpdatePost(id, user.ID, postRequest.Content)
+	userID := httputils.GetUserIDFromContext(r.Context())
+	post, err := models.UpdatePost(id, userID, postRequest.Content)
 
 	if gorm.IsRecordNotFoundError(err) {
 		w.WriteHeader(http.StatusNotFound)
@@ -98,8 +98,8 @@ func PostDelete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 10, 64)
 
-	user := httputils.GetUserFromContext(r.Context())
-	err := models.DeletePost(id, user.ID)
+	userID := httputils.GetUserIDFromContext(r.Context())
+	err := models.DeletePost(id, userID)
 	if gorm.IsRecordNotFoundError(err) {
 		w.WriteHeader(http.StatusNotFound)
 		return
