@@ -48,13 +48,15 @@ func PostCreate(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &postRequest)
 
 	userID := httputils.GetUserIDFromContext(r.Context())
-	err := models.CreatePost(userID, postRequest.Content)
+	post, err := models.CreatePost(userID, postRequest.Content)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
+	res, _ := json.Marshal(post.SwaggerModel())
+	w.Write(res)
 }
 
 func PostUpdate(w http.ResponseWriter, r *http.Request) {
@@ -69,7 +71,7 @@ func PostUpdate(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &postRequest)
 
 	userID := httputils.GetUserIDFromContext(r.Context())
-	err := models.UpdatePost(id, userID, postRequest.Content)
+	post, err := models.UpdatePost(id, userID, postRequest.Content)
 
 	if gorm.IsRecordNotFoundError(err) {
 		w.WriteHeader(http.StatusNotFound)
@@ -82,7 +84,9 @@ func PostUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
+	res, _ := json.Marshal(post.SwaggerModel())
+	w.Write(res)
 }
 
 func PostDelete(w http.ResponseWriter, r *http.Request) {

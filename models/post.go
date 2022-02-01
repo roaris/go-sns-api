@@ -33,36 +33,35 @@ func ShowPost(id int64) (post Post, err error) {
 	return post, err
 }
 
-func CreatePost(userID int64, content string) (err error) {
-	post := Post{}
+func CreatePost(userID int64, content string) (post Post, err error) {
 	post.UserID = userID
 	post.Content = content
 	validate := validator.New()
 	err = validate.Struct(post)
 	if err != nil {
-		return err
+		return post, err
 	}
 	db.Create(&post)
-	return nil
+	return post, nil
 }
 
-func UpdatePost(id int64, userID int64, content string) (err error) {
-	post, err := ShowPost(id)
+func UpdatePost(id int64, userID int64, content string) (post Post, err error) {
+	post, err = ShowPost(id)
 	if err != nil {
-		return err
+		return post, err
 	}
 	if post.UserID != userID {
-		return errors.New("forbidden update")
+		return post, errors.New("forbidden update")
 	}
 	postAfter := post
 	postAfter.Content = content
 	validate := validator.New()
 	err = validate.Struct(postAfter)
 	if err != nil {
-		return err
+		return post, err
 	}
 	db.Model(&post).Updates(postAfter)
-	return nil
+	return post, nil
 }
 
 func DeletePost(id int64, userID int64) (err error) {
