@@ -5,6 +5,7 @@ info:
   contact:
     name: roaris
     url: 'https://github.com/roaris/go-sns-api'
+  version: '1.0'
 host: 'localhost:8080'
 basePath: /api/v1
 securityDefinitions:
@@ -22,18 +23,7 @@ paths:
         '200':
           description: OK
           schema:
-            type: object
-            properties:
-              id:
-                type: integer
-              content:
-                type: string
-              user_id:
-                type: integer
-              created_at:
-                type: string
-              updated_at:
-                type: string
+            $ref: '#/definitions/Post'
           examples: {}
         '404':
           description: Not Found
@@ -207,3 +197,36 @@ paths:
         - User
 schemes:
   - http
+definitions:
+  Post:
+    title: Post
+    type: object
+    properties:
+      id:
+        type: integer
+      content:
+        type: string
+      user_id:
+        type: integer
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
+  User:
+    title: User
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+  PostAndUser:
+    title: PostAndUser
+    type: object
+    properties:
+      post:
+        $ref: '#/definitions/Post'
+      user:
+        $ref: '#/definitions/User'
