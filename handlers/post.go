@@ -9,6 +9,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/roaris/go-sns-api/httputils"
 	"github.com/roaris/go-sns-api/models"
+	"github.com/roaris/go-sns-api/swagger/gen"
 	"gopkg.in/go-playground/validator.v9"
 )
 
@@ -30,7 +31,10 @@ func PostShow(w http.ResponseWriter, r *http.Request) {
 	// header → status code → response body の順番にしないと無効になる
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	res, _ := json.Marshal(post.SwaggerModel())
+	res, _ := json.Marshal(gen.PostAndUser{
+		Post: post.SwaggerModel(),
+		User: post.User.SwaggerModel(),
+	})
 	w.Write(res)
 }
 

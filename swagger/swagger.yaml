@@ -222,3 +222,11 @@ definitions:
         type: integer
       name:
         type: string
+  PostAndUser:
+    title: PostAndUser
+    type: object
+    properties:
+      post:
+        $ref: '#/definitions/Post'
+      user:
+        $ref: '#/definitions/User'
