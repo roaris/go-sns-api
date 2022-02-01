@@ -12,7 +12,7 @@ import (
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
+			w.WriteHeader(http.StatusOK)
 		w.Write([]byte("pong"))
 	})
 
