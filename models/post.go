@@ -10,12 +10,12 @@ import (
 )
 
 type Post struct {
-	ID        int64     `json:"id"`
-	Content   string    `json:"content" validate:"required,max=140"`
-	UserID    int64     `json:"user_id" validate:"required"`
-	User      *User     `json:"user,omitempty" validate:"-"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        int64
+	Content   string `validate:"required,max=140"`
+	UserID    int64  `validate:"required"`
+	User      *User  `validate:"-"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func (p *Post) SwaggerModel() *gen.Post {

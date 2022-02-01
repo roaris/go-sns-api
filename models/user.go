@@ -11,12 +11,12 @@ import (
 )
 
 type User struct {
-	ID        int64  `json:"id"`
-	Name      string `json:"name" validate:"required,min=3"`
-	Email     string `json:"email" validate:"required,email" gorm:"unique_index"`
-	Password  string `json:"password" validate:"required"`
+	ID        int64
+	Name      string `validate:"required,min=3"`
+	Email     string `validate:"required,email" gorm:"unique_index"`
+	Password  string `validate:"required"`
 	Posts     []Post
-	CreatedAt time.Time `json:"created_at"`
+	CreatedAt time.Time
 }
 
 func (u *User) SwaggerModel() *gen.User {
