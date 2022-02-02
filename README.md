@@ -1,5 +1,7 @@
 # go-sns-api
 
+[![golangci-lint](https://github.com/roaris/go-sns-api/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/roaris/go-sns-api/actions/workflows/golangci-lint.yml)
+
 ## 動作環境
 ```
 $ docker -v
