@@ -28,7 +28,7 @@ func (p *Post) SwaggerModel() *gen.Post {
 	}
 }
 
-func ShowPost(id int) (post Post, err error) {
+func ShowPost(id int64) (post Post, err error) {
 	err = db.First(&post, "id=?", id).Error
 	if err != nil {
 		return post, err
