@@ -195,6 +195,26 @@ paths:
           description: ''
       tags:
         - User
+  /users/me:
+    get:
+      summary: ''
+      tags:
+        - User
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties: {}
+        '401':
+          description: Unauthorized
+          schema:
+            type: object
+            properties: {}
+      operationId: get-users-me
+      description: ログイン中のユーザー情報を取得する
+      security:
+        - Authorization: []
 schemes:
   - http
 definitions:
@@ -221,6 +241,8 @@ definitions:
       id:
         type: integer
       name:
+        type: string
+      email:
         type: string
   PostAndUser:
     title: PostAndUser

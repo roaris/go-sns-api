@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/roaris/go-sns-api/httputils"
+
 	"github.com/go-sql-driver/mysql"
 	"github.com/roaris/go-sns-api/models"
 	"gopkg.in/go-playground/validator.v9"
@@ -42,5 +44,15 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	res, _ := json.Marshal(user.SwaggerModel())
+	w.Write(res)
+}
+
+func GetLoginUser(w http.ResponseWriter, r *http.Request) {
+	userID := httputils.GetUserIDFromContext(r.Context())
+	user, _ := models.GetUserById(userID)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	res, _ := json.Marshal(user.SwaggerModelWithEmail())
 	w.Write(res)
 }
