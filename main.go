@@ -38,6 +38,7 @@ func main() {
 	v1r.Methods(http.MethodDelete).Path("/posts/{id:[0-9]+}").HandlerFunc(middlewares.AuthMiddleware(handlers.PostDelete))
 	v1r.Methods(http.MethodPost).Path("/users").HandlerFunc(handlers.UserCreate)
 	v1r.Methods(http.MethodGet).Path("/users/me").HandlerFunc(middlewares.AuthMiddleware(handlers.GetLoginUser))
+	v1r.Methods(http.MethodPatch).Path("/users/me").HandlerFunc(middlewares.AuthMiddleware(handlers.UpdateLoginUser))
 	v1r.Methods(http.MethodPost).Path("/auth").HandlerFunc(handlers.Authenticate)
 	http.ListenAndServe(":8080", c.Handler(r))
 }

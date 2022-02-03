@@ -215,6 +215,29 @@ paths:
       description: ログイン中のユーザー情報を取得する
       security:
         - Authorization: []
+    patch:
+      summary: ''
+      operationId: patch-users-me
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        '401':
+          description: Unauthorized
+          schema:
+            type: object
+            properties: {}
+      description: ユーザー情報更新
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/UserUpdateRequest'
+      tags:
+        - User
+      security:
+        - Authorization: []
 schemes:
   - http
 definitions:
@@ -252,3 +275,15 @@ definitions:
         $ref: '#/definitions/Post'
       user:
         $ref: '#/definitions/User'
+  UserUpdateRequest:
+    title: UserUpdateRequest
+    type: object
+    properties:
+      name:
+        type: string
+      email:
+        type: string
+        format: email
+      password:
+        type: string
+        minLength: 6

@@ -68,3 +68,13 @@ func GetUserByEmail(email string) (user User, err error) {
 	err = db.First(&user, "email=?", email).Error
 	return user, err
 }
+
+func UpdateUser(id int64, name string, email string, password string) (user User){
+	user, _ = GetUserById(id)
+	userAfter := user
+	userAfter.Name = name
+	userAfter.Email = email
+	userAfter.Password = Encrypt(password)
+	db.Model(&user).Updates(userAfter)
+	return user
+}
