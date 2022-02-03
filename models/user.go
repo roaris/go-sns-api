@@ -69,7 +69,7 @@ func GetUserByEmail(email string) (user User, err error) {
 	return user, err
 }
 
-func UpdateUser(id int64, name string, email string, password string) (user User){
+func UpdateUser(id int64, name string, email string, password string) (user User) {
 	user, _ = GetUserById(id)
 	userAfter := user
 	userAfter.Name = name

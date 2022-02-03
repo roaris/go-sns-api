@@ -72,6 +72,7 @@ func UpdateLoginUser(w http.ResponseWriter, r *http.Request) {
 
 	if err := userUpdateRequest.Validate(strfmt.Default); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
 	userID := httputils.GetUserIDFromContext(r.Context())
