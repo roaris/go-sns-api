@@ -17,6 +17,9 @@ import (
 // swagger:model User
 type User struct {
 
+	// email
+	Email string `json:"email,omitempty"`
+
 	// id
 	ID int64 `json:"id,omitempty"`
 

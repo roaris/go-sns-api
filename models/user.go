@@ -26,6 +26,14 @@ func (u *User) SwaggerModel() *gen.User {
 	}
 }
 
+func (u *User) SwaggerModelWithEmail() *gen.User {
+	return &gen.User{
+		ID:    u.ID,
+		Name:  u.Name,
+		Email: u.Email,
+	}
+}
+
 func Encrypt(password string) string {
 	hash, _ := bcrypt.GenerateFromPassword([]byte(password), 12)
 	return string(hash)
@@ -51,7 +59,22 @@ func CreateUser(name string, email string, password string) (user User, err erro
 	return user, nil
 }
 
+func GetUserById(id int64) (user User, err error) {
+	err = db.First(&user, "id=?", id).Error
+	return user, err
+}
+
 func GetUserByEmail(email string) (user User, err error) {
 	err = db.First(&user, "email=?", email).Error
 	return user, err
+}
+
+func UpdateUser(id int64, name string, email string, password string) (user User) {
+	user, _ = GetUserById(id)
+	userAfter := user
+	userAfter.Name = name
+	userAfter.Email = email
+	userAfter.Password = Encrypt(password)
+	db.Model(&user).Updates(userAfter)
+	return user
 }
