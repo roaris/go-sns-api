@@ -35,11 +35,10 @@ func GenerateToken(userID int64, now time.Time) (string, error) {
 	return token.SignedString([]byte(os.Getenv("SECRET")))
 }
 
-func Authenticate(w http.ResponseWriter, r *http.Request) {
+func Authenticate(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// application/jsonのみ受け付ける
 	if r.Header.Get("Content-Type") != "application/json" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return http.StatusBadRequest, nil, nil
 	}
 
 	// リクエストボディをAuthRequestに変換する
@@ -50,21 +49,16 @@ func Authenticate(w http.ResponseWriter, r *http.Request) {
 
 	user, err := models.GetUserByEmail(authRequest.Email)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
+		return http.StatusUnauthorized, nil, err
 	}
 
 	// パスワードの検証
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(authRequest.Password))
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
+		return http.StatusUnauthorized, nil, err
 	}
 
 	// トークンを返す
 	token, _ := GenerateToken(user.ID, time.Now())
-	res, _ := json.Marshal(Token{token})
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(res)
+	return http.StatusOK, Token{token}, nil
 }
