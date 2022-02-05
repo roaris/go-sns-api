@@ -34,14 +34,13 @@ func main() {
 	v1r := r.PathPrefix("/api/v1").Subrouter()
 
 	authMiddleware := middlewares.AuthMiddleware
-	responseMiddleware := middlewares.ResponseMiddleware
-	v1r.Methods(http.MethodPost).Path("/posts").HandlerFunc(authMiddleware(responseMiddleware(handlers.CreatePost)))
-	v1r.Methods(http.MethodGet).Path("/posts/{id:[0-9]+}").HandlerFunc(responseMiddleware(handlers.GetPost))
-	v1r.Methods(http.MethodPatch).Path("/posts/{id:[0-9]+}").HandlerFunc(authMiddleware(responseMiddleware(handlers.UpdatePost)))
-	v1r.Methods(http.MethodDelete).Path("/posts/{id:[0-9]+}").HandlerFunc(authMiddleware(responseMiddleware(handlers.DeletePost)))
-	v1r.Methods(http.MethodPost).Path("/users").HandlerFunc(responseMiddleware(handlers.CreateUser))
-	v1r.Methods(http.MethodGet).Path("/users/me").HandlerFunc(authMiddleware(responseMiddleware(handlers.GetLoginUser)))
-	v1r.Methods(http.MethodPatch).Path("/users/me").HandlerFunc(authMiddleware(responseMiddleware(handlers.UpdateLoginUser)))
-	v1r.Methods(http.MethodPost).Path("/auth").HandlerFunc(responseMiddleware(handlers.Authenticate))
+	v1r.Methods(http.MethodPost).Path("/posts").Handler(authMiddleware(AppHandler{handlers.CreatePost}))
+	v1r.Methods(http.MethodGet).Path("/posts/{id:[0-9]+}").Handler(AppHandler{handlers.GetPost})
+	v1r.Methods(http.MethodPatch).Path("/posts/{id:[0-9]+}").Handler(authMiddleware(AppHandler{handlers.UpdatePost}))
+	v1r.Methods(http.MethodDelete).Path("/posts/{id:[0-9]+}").Handler(authMiddleware(AppHandler{handlers.DeletePost}))
+	v1r.Methods(http.MethodPost).Path("/users").Handler(AppHandler{handlers.CreateUser})
+	v1r.Methods(http.MethodGet).Path("/users/me").Handler(authMiddleware(AppHandler{handlers.GetLoginUser}))
+	v1r.Methods(http.MethodPatch).Path("/users/me").Handler(authMiddleware(AppHandler{handlers.UpdateLoginUser}))
+	v1r.Methods(http.MethodPost).Path("/auth").Handler(AppHandler{handlers.Authenticate})
 	http.ListenAndServe(":8080", c.Handler(r))
 }

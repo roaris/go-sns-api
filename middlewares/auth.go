@@ -41,7 +41,7 @@ func parseToken(signedString string) (int64, error) {
 }
 
 // JWTトークンの検証を行うミドルウェア
-func AuthMiddleware(handler http.HandlerFunc) http.HandlerFunc {
+func AuthMiddleware(next http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		token, err := getTokenFromHeader(r)
 		if err != nil {
@@ -54,6 +54,6 @@ func AuthMiddleware(handler http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 		ctx := httputils.SetUserIDToContext(r.Context(), userID)
-		handler(w, r.WithContext(ctx))
+		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 }
