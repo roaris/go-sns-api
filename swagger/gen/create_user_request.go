@@ -14,16 +14,17 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// UserUpdateRequest UserUpdateRequest
+// CreateUserRequest CreateUserRequest
 //
-// swagger:model UserUpdateRequest
-type UserUpdateRequest struct {
+// swagger:model CreateUserRequest
+type CreateUserRequest struct {
 
 	// email
 	// Format: email
 	Email strfmt.Email `json:"email,omitempty"`
 
 	// name
+	// Min Length: 3
 	Name string `json:"name,omitempty"`
 
 	// password
@@ -31,11 +32,15 @@ type UserUpdateRequest struct {
 	Password string `json:"password,omitempty"`
 }
 
-// Validate validates this user update request
-func (m *UserUpdateRequest) Validate(formats strfmt.Registry) error {
+// Validate validates this create user request
+func (m *CreateUserRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateEmail(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateName(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -49,7 +54,7 @@ func (m *UserUpdateRequest) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *UserUpdateRequest) validateEmail(formats strfmt.Registry) error {
+func (m *CreateUserRequest) validateEmail(formats strfmt.Registry) error {
 	if swag.IsZero(m.Email) { // not required
 		return nil
 	}
@@ -61,7 +66,19 @@ func (m *UserUpdateRequest) validateEmail(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *UserUpdateRequest) validatePassword(formats strfmt.Registry) error {
+func (m *CreateUserRequest) validateName(formats strfmt.Registry) error {
+	if swag.IsZero(m.Name) { // not required
+		return nil
+	}
+
+	if err := validate.MinLength("name", "body", m.Name, 3); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CreateUserRequest) validatePassword(formats strfmt.Registry) error {
 	if swag.IsZero(m.Password) { // not required
 		return nil
 	}
@@ -73,13 +90,13 @@ func (m *UserUpdateRequest) validatePassword(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this user update request based on context it is used
-func (m *UserUpdateRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validates this create user request based on context it is used
+func (m *CreateUserRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *UserUpdateRequest) MarshalBinary() ([]byte, error) {
+func (m *CreateUserRequest) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -87,8 +104,8 @@ func (m *UserUpdateRequest) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *UserUpdateRequest) UnmarshalBinary(b []byte) error {
-	var res UserUpdateRequest
+func (m *CreateUserRequest) UnmarshalBinary(b []byte) error {
+	var res CreateUserRequest
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

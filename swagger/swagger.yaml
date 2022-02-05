@@ -69,10 +69,7 @@ paths:
         - in: body
           name: body
           schema:
-            type: object
-            properties:
-              content:
-                type: string
+            $ref: '#/definitions/UpdatePostRequest'
       security:
         - Authorization: []
       tags:
@@ -120,10 +117,7 @@ paths:
         - in: body
           name: body
           schema:
-            type: object
-            properties:
-              content:
-                type: string
+            $ref: '#/definitions/CreatePostRequest'
           description: ''
       tags:
         - Post
@@ -152,12 +146,7 @@ paths:
         - in: body
           name: body
           schema:
-            type: object
-            properties:
-              email:
-                type: string
-              password:
-                type: string
+            $ref: '#/definitions/AuthRequest'
           x-examples:
             example-1:
               email: strng
@@ -183,14 +172,7 @@ paths:
         - in: body
           name: body
           schema:
-            type: object
-            properties:
-              name:
-                type: string
-              email:
-                type: string
-              password:
-                type: string
+            $ref: '#/definitions/CreateUserRequest'
           x-examples: {}
           description: ''
       tags:
@@ -233,7 +215,7 @@ paths:
         - in: body
           name: body
           schema:
-            $ref: '#/definitions/UserUpdateRequest'
+            $ref: '#/definitions/UpdateUserRequest'
       tags:
         - User
       security:
@@ -275,15 +257,53 @@ definitions:
         $ref: '#/definitions/Post'
       user:
         $ref: '#/definitions/User'
-  UserUpdateRequest:
-    title: UserUpdateRequest
+  UpdateUserRequest:
+    title: UpdateUserRequest
     type: object
     properties:
       name:
         type: string
+        minLength: 3
       email:
         type: string
         format: email
       password:
         type: string
         minLength: 6
+  CreateUserRequest:
+    title: CreateUserRequest
+    type: object
+    properties:
+      name:
+        type: string
+        minLength: 3
+      email:
+        type: string
+        format: email
+      password:
+        type: string
+        minLength: 6
+  AuthRequest:
+    title: AuthRequest
+    type: object
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+  CreatePostRequest:
+    title: CreatePostRequest
+    type: object
+    properties:
+      content:
+        type: string
+        minLength: 1
+        maxLength: 140
+  UpdatePostRequest:
+    title: UpdatePostRequest
+    type: object
+    properties:
+      content:
+        type: string
+        minLength: 1
+        maxLength: 140
