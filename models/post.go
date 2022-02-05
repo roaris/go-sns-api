@@ -6,7 +6,6 @@ import (
 
 	"github.com/go-openapi/strfmt"
 	"github.com/roaris/go-sns-api/swagger/gen"
-	"gopkg.in/go-playground/validator.v9"
 )
 
 type Post struct {
@@ -42,11 +41,6 @@ func GetPost(id int64) (post Post, err error) {
 func CreatePost(userID int64, content string) (post Post, err error) {
 	post.UserID = userID
 	post.Content = content
-	validate := validator.New()
-	err = validate.Struct(post)
-	if err != nil {
-		return post, err
-	}
 	db.Create(&post)
 	return post, nil
 }
@@ -61,11 +55,6 @@ func UpdatePost(id int64, userID int64, content string) (post Post, err error) {
 	}
 	postAfter := post
 	postAfter.Content = content
-	validate := validator.New()
-	err = validate.Struct(postAfter)
-	if err != nil {
-		return post, err
-	}
 	db.Model(&post).Updates(postAfter)
 	return post, nil
 }

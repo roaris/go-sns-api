@@ -8,16 +8,8 @@ import (
 	"github.com/roaris/go-sns-api/httputils"
 	"github.com/roaris/go-sns-api/swagger/gen"
 
-	"github.com/go-sql-driver/mysql"
 	"github.com/roaris/go-sns-api/models"
-	"gopkg.in/go-playground/validator.v9"
 )
-
-type UserRequest struct {
-	Name     string
-	Email    string
-	Password string
-}
 
 func CreateUser(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// application/jsonのみ受け付ける
@@ -28,16 +20,16 @@ func CreateUser(w http.ResponseWriter, r *http.Request) (int, interface{}, error
 	// リクエストボディをUserRequestに変換する
 	body := make([]byte, r.ContentLength)
 	r.Body.Read(body)
-	var userRequest UserRequest
-	json.Unmarshal(body, &userRequest)
+	var createUserRequest gen.CreateUserRequest
+	json.Unmarshal(body, &createUserRequest)
 
-	user, err := models.CreateUser(userRequest.Name, userRequest.Email, userRequest.Password)
-	if _, ok := err.(validator.ValidationErrors); ok {
+	if err := createUserRequest.Validate(strfmt.Default); err != nil {
 		return http.StatusBadRequest, nil, err
-	} else if _, ok := err.(*mysql.MySQLError); ok {
+	}
+
+	user, err := models.CreateUser(createUserRequest.Name, string(createUserRequest.Email), createUserRequest.Password)
+	if err != nil {
 		return http.StatusConflict, nil, err
-	} else if err != nil && err.Error() == "too short password" {
-		return http.StatusBadRequest, nil, err
 	}
 
 	return http.StatusOK, user.SwaggerModel(), nil
@@ -56,19 +48,19 @@ func UpdateLoginUser(w http.ResponseWriter, r *http.Request) (int, interface{}, 
 
 	body := make([]byte, r.ContentLength)
 	r.Body.Read(body)
-	var userUpdateRequest gen.UserUpdateRequest
-	json.Unmarshal(body, &userUpdateRequest)
+	var updateUserRequest gen.UpdateUserRequest
+	json.Unmarshal(body, &updateUserRequest)
 
-	if err := userUpdateRequest.Validate(strfmt.Default); err != nil {
+	if err := updateUserRequest.Validate(strfmt.Default); err != nil {
 		return http.StatusBadRequest, nil, err
 	}
 
 	userID := httputils.GetUserIDFromContext(r.Context())
 	user := models.UpdateUser(
 		userID,
-		userUpdateRequest.Name,
-		string(userUpdateRequest.Email),
-		userUpdateRequest.Password,
+		updateUserRequest.Name,
+		string(updateUserRequest.Email),
+		updateUserRequest.Password,
 	)
 
 	return http.StatusOK, user.SwaggerModelWithEmail(), nil

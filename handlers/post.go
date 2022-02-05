@@ -5,17 +5,13 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-openapi/strfmt"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	"github.com/roaris/go-sns-api/httputils"
 	"github.com/roaris/go-sns-api/models"
 	"github.com/roaris/go-sns-api/swagger/gen"
-	"gopkg.in/go-playground/validator.v9"
 )
-
-type PostRequest struct {
-	Content string
-}
 
 func CreatePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// application/jsonのみ受け付ける
@@ -26,11 +22,15 @@ func CreatePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error
 	// リクエストボディをPostRequestに変換する
 	body := make([]byte, r.ContentLength)
 	r.Body.Read(body)
-	var postRequest PostRequest
-	json.Unmarshal(body, &postRequest)
+	var createPostRequest gen.CreatePostRequest
+	json.Unmarshal(body, &createPostRequest)
+
+	if err := createPostRequest.Validate(strfmt.Default); err != nil {
+		return http.StatusBadRequest, nil, err
+	}
 
 	userID := httputils.GetUserIDFromContext(r.Context())
-	post, err := models.CreatePost(userID, postRequest.Content)
+	post, err := models.CreatePost(userID, createPostRequest.Content)
 
 	if err != nil {
 		return http.StatusBadRequest, nil, err
@@ -62,16 +62,18 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error
 	// リクエストボディをPostRequestに変換する
 	body := make([]byte, r.ContentLength)
 	r.Body.Read(body)
-	var postRequest PostRequest
-	json.Unmarshal(body, &postRequest)
+	var updatePostRequest gen.UpdatePostRequest
+	json.Unmarshal(body, &updatePostRequest)
+
+	if err := updatePostRequest.Validate(strfmt.Default); err != nil {
+		return http.StatusBadRequest, nil, err
+	}
 
 	userID := httputils.GetUserIDFromContext(r.Context())
-	post, err := models.UpdatePost(id, userID, postRequest.Content)
+	post, err := models.UpdatePost(id, userID, updatePostRequest.Content)
 
 	if gorm.IsRecordNotFoundError(err) {
 		return http.StatusNotFound, nil, err
-	} else if _, ok := err.(validator.ValidationErrors); ok {
-		return http.StatusBadRequest, nil, err
 	} else if err != nil && err.Error() == "forbidden update" {
 		return http.StatusForbidden, nil, err
 	}
