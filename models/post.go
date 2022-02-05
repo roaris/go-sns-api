@@ -28,7 +28,7 @@ func (p *Post) SwaggerModel() *gen.Post {
 	}
 }
 
-func ShowPost(id int64) (post Post, err error) {
+func GetPost(id int64) (post Post, err error) {
 	err = db.First(&post, "id=?", id).Error
 	if err != nil {
 		return post, err
@@ -52,7 +52,7 @@ func CreatePost(userID int64, content string) (post Post, err error) {
 }
 
 func UpdatePost(id int64, userID int64, content string) (post Post, err error) {
-	post, err = ShowPost(id)
+	post, err = GetPost(id)
 	if err != nil {
 		return post, err
 	}
@@ -71,7 +71,7 @@ func UpdatePost(id int64, userID int64, content string) (post Post, err error) {
 }
 
 func DeletePost(id int64, userID int64) (err error) {
-	post, err := ShowPost(id)
+	post, err := GetPost(id)
 	if err != nil {
 		return err
 	}

@@ -17,28 +17,7 @@ type PostRequest struct {
 	Content string
 }
 
-func PostShow(w http.ResponseWriter, r *http.Request) {
-	// パスパラメータの取得
-	vars := mux.Vars(r)
-	id, _ := strconv.ParseInt(vars["id"], 10, 64)
-
-	post, err := models.ShowPost(id)
-	if gorm.IsRecordNotFoundError(err) {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	// header → status code → response body の順番にしないと無効になる
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	res, _ := json.Marshal(gen.PostAndUser{
-		Post: post.SwaggerModel(),
-		User: post.User.SwaggerModel(),
-	})
-	w.Write(res)
-}
-
-func PostCreate(w http.ResponseWriter, r *http.Request) {
+func CreatePost(w http.ResponseWriter, r *http.Request) {
 	// application/jsonのみ受け付ける
 	if r.Header.Get("Content-Type") != "application/json" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -63,7 +42,28 @@ func PostCreate(w http.ResponseWriter, r *http.Request) {
 	w.Write(res)
 }
 
-func PostUpdate(w http.ResponseWriter, r *http.Request) {
+func GetPost(w http.ResponseWriter, r *http.Request) {
+	// パスパラメータの取得
+	vars := mux.Vars(r)
+	id, _ := strconv.ParseInt(vars["id"], 10, 64)
+
+	post, err := models.GetPost(id)
+	if gorm.IsRecordNotFoundError(err) {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	// header → status code → response body の順番にしないと無効になる
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	res, _ := json.Marshal(gen.PostAndUser{
+		Post: post.SwaggerModel(),
+		User: post.User.SwaggerModel(),
+	})
+	w.Write(res)
+}
+
+func UpdatePost(w http.ResponseWriter, r *http.Request) {
 	// パスパラメータの取得
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 10, 64)
@@ -93,7 +93,7 @@ func PostUpdate(w http.ResponseWriter, r *http.Request) {
 	w.Write(res)
 }
 
-func PostDelete(w http.ResponseWriter, r *http.Request) {
+func DeletePost(w http.ResponseWriter, r *http.Request) {
 	// パスパラメータの取得
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 10, 64)
