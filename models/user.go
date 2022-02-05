@@ -1,20 +1,17 @@
 package models
 
 import (
-	"errors"
 	"time"
-	"unicode/utf8"
 
 	"github.com/roaris/go-sns-api/swagger/gen"
 	"golang.org/x/crypto/bcrypt"
-	"gopkg.in/go-playground/validator.v9"
 )
 
 type User struct {
 	ID        int64
-	Name      string `validate:"required,min=3"`
-	Email     string `validate:"required,email" gorm:"unique_index"`
-	Password  string `validate:"required"`
+	Name      string
+	Email     string `gorm:"unique_index"`
+	Password  string
 	Posts     []Post
 	CreatedAt time.Time
 }
@@ -40,18 +37,9 @@ func Encrypt(password string) string {
 }
 
 func CreateUser(name string, email string, password string) (user User, err error) {
-	if utf8.RuneCountInString(password) < 6 {
-		err = errors.New("too short password")
-		return user, err
-	}
 	user.Name = name
 	user.Email = email
 	user.Password = Encrypt(password)
-	validate := validator.New()
-	err = validate.Struct(user)
-	if err != nil {
-		return user, err
-	}
 	err = db.Create(&user).Error
 	if err != nil {
 		return user, err
