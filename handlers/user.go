@@ -19,11 +19,10 @@ type UserRequest struct {
 	Password string
 }
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func CreateUser(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// application/jsonのみ受け付ける
 	if r.Header.Get("Content-Type") != "application/json" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return http.StatusBadRequest, nil, nil
 	}
 
 	// リクエストボディをUserRequestに変換する
@@ -34,35 +33,25 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	user, err := models.CreateUser(userRequest.Name, userRequest.Email, userRequest.Password)
 	if _, ok := err.(validator.ValidationErrors); ok {
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return http.StatusBadRequest, nil, err
 	} else if _, ok := err.(*mysql.MySQLError); ok {
-		w.WriteHeader(http.StatusConflict)
-		return
+		return http.StatusConflict, nil, err
 	} else if err != nil && err.Error() == "too short password" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return http.StatusBadRequest, nil, err
 	}
 
-	w.WriteHeader(http.StatusOK)
-	res, _ := json.Marshal(user.SwaggerModel())
-	w.Write(res)
+	return http.StatusOK, user.SwaggerModel(), nil
 }
 
-func GetLoginUser(w http.ResponseWriter, r *http.Request) {
+func GetLoginUser(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	userID := httputils.GetUserIDFromContext(r.Context())
 	user, _ := models.GetUserById(userID)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	res, _ := json.Marshal(user.SwaggerModelWithEmail())
-	w.Write(res)
+	return http.StatusOK, user.SwaggerModelWithEmail(), nil
 }
 
-func UpdateLoginUser(w http.ResponseWriter, r *http.Request) {
+func UpdateLoginUser(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	if r.Header.Get("Content-Type") != "application/json" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return http.StatusBadRequest, nil, nil
 	}
 
 	body := make([]byte, r.ContentLength)
@@ -71,8 +60,7 @@ func UpdateLoginUser(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &userUpdateRequest)
 
 	if err := userUpdateRequest.Validate(strfmt.Default); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return http.StatusBadRequest, nil, err
 	}
 
 	userID := httputils.GetUserIDFromContext(r.Context())
@@ -83,8 +71,5 @@ func UpdateLoginUser(w http.ResponseWriter, r *http.Request) {
 		userUpdateRequest.Password,
 	)
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	res, _ := json.Marshal(user.SwaggerModelWithEmail())
-	w.Write(res)
+	return http.StatusOK, user.SwaggerModelWithEmail(), nil
 }

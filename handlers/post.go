@@ -17,11 +17,10 @@ type PostRequest struct {
 	Content string
 }
 
-func CreatePost(w http.ResponseWriter, r *http.Request) {
+func CreatePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// application/jsonのみ受け付ける
 	if r.Header.Get("Content-Type") != "application/json" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return http.StatusBadRequest, nil, nil
 	}
 
 	// リクエストボディをPostRequestに変換する
@@ -34,36 +33,28 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	post, err := models.CreatePost(userID, postRequest.Content)
 
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return http.StatusBadRequest, nil, err
 	}
-	w.WriteHeader(http.StatusOK)
-	res, _ := json.Marshal(post.SwaggerModel())
-	w.Write(res)
+	return http.StatusOK, post.SwaggerModel(), nil
 }
 
-func GetPost(w http.ResponseWriter, r *http.Request) {
+func GetPost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// パスパラメータの取得
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 10, 64)
 
 	post, err := models.GetPost(id)
 	if gorm.IsRecordNotFoundError(err) {
-		w.WriteHeader(http.StatusNotFound)
-		return
+		return http.StatusNotFound, nil, err
 	}
 
-	// header → status code → response body の順番にしないと無効になる
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	res, _ := json.Marshal(gen.PostAndUser{
-		Post: post.SwaggerModel(),
-		User: post.User.SwaggerModel(),
-	})
-	w.Write(res)
+	return http.StatusOK, gen.PostAndUser{
+			Post: post.SwaggerModel(),
+			User: post.User.SwaggerModel()},
+		nil
 }
 
-func UpdatePost(w http.ResponseWriter, r *http.Request) {
+func UpdatePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// パスパラメータの取得
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 10, 64)
@@ -78,22 +69,17 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
 	post, err := models.UpdatePost(id, userID, postRequest.Content)
 
 	if gorm.IsRecordNotFoundError(err) {
-		w.WriteHeader(http.StatusNotFound)
-		return
+		return http.StatusNotFound, nil, err
 	} else if _, ok := err.(validator.ValidationErrors); ok {
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return http.StatusBadRequest, nil, err
 	} else if err != nil && err.Error() == "forbidden update" {
-		w.WriteHeader(http.StatusForbidden)
-		return
+		return http.StatusForbidden, nil, err
 	}
 
-	w.WriteHeader(http.StatusOK)
-	res, _ := json.Marshal(post.SwaggerModel())
-	w.Write(res)
+	return http.StatusOK, post.SwaggerModel(), nil
 }
 
-func DeletePost(w http.ResponseWriter, r *http.Request) {
+func DeletePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// パスパラメータの取得
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 10, 64)
@@ -101,12 +87,10 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 	userID := httputils.GetUserIDFromContext(r.Context())
 	err := models.DeletePost(id, userID)
 	if gorm.IsRecordNotFoundError(err) {
-		w.WriteHeader(http.StatusNotFound)
-		return
+		return http.StatusNotFound, nil, err
 	} else if err != nil && err.Error() == "forbidden delete" {
-		w.WriteHeader(http.StatusForbidden)
-		return
+		return http.StatusForbidden, nil, err
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	return http.StatusOK, nil, nil
 }
