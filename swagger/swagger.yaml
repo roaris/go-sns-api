@@ -292,6 +292,28 @@ paths:
             properties: {}
       operationId: get-users-user_id-followees
       description: フォローしているユーザー一覧
+  '/users/{user_id}/followers':
+    parameters:
+      - type: string
+        name: user_id
+        in: path
+        required: true
+    get:
+      summary: ''
+      tags:
+        - Friendship
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Followers'
+        '404':
+          description: Not Found
+          schema:
+            type: object
+            properties: {}
+      operationId: get-users-user_id-followers
+      description: フォローされているユーザー一覧
 schemes:
   - http
 definitions:
@@ -390,6 +412,14 @@ definitions:
     type: object
     properties:
       followees:
+        type: array
+        items:
+          $ref: '#/definitions/User'
+  Followers:
+    title: Followers
+    type: object
+    properties:
+      followers:
         type: array
         items:
           $ref: '#/definitions/User'

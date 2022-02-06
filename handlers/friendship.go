@@ -59,6 +59,24 @@ func GetFollowees(w http.ResponseWriter, r *http.Request) (int, interface{}, err
 	return http.StatusOK, gen.Followees{Followees: resFollowees}, nil
 }
 
+func GetFollowers(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+	vars := mux.Vars(r)
+	userID, err := strconv.ParseInt(vars["id"], 10, 64)
+	if err != nil {
+		return http.StatusBadRequest, nil, err
+	}
+
+	followers, err := models.GetFollowers(userID)
+	if err != nil {
+		return http.StatusNotFound, nil, err
+	}
+	var resFollowers []*gen.User
+	for _, f := range followers {
+		resFollowers = append(resFollowers, f.SwaggerModel())
+	}
+	return http.StatusOK, gen.Followers{Followers: resFollowers}, nil
+}
+
 func DeleteFollowee(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	followerID := httputils.GetUserIDFromContext(r.Context())
 	vars := mux.Vars(r)
