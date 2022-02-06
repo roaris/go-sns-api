@@ -29,6 +29,10 @@ Swagger: [localhost:8081](http://localhost:8081)
 | /api/v1/users/me | GET | ログイン中のユーザー取得 | YES
 | /api/v1/users/me | PATCH | ログイン中のユーザー情報更新 | YES
 | /api/v1/auth | POST | JWTトークンを返す | NO
+| /api/v1/users/me/followees | POST | ユーザーのフォロー | YES
+| /api/v1/users/me/followees/:id | DELETE | ユーザーのアンフォロー | YES
+| /api/v1/users/:id/followees | GET | ユーザーのフォロイー一覧 | NO
+| /api/v1/users/:id/followers | GET | ユーザーのフォロワー一覧 | NO
 | /api/v1/posts/:id | GET | 投稿取得 | NO
 | /api/v1/posts | POST | 投稿作成 | YES
 | /api/v1/posts/:id | PATCH | 投稿編集 | YES
