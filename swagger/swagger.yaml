@@ -270,6 +270,28 @@ paths:
         - Authorization: []
       tags:
         - Friendship
+  '/users/{user_id}/followees':
+    parameters:
+      - type: string
+        name: user_id
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags:
+        - Friendship
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Followees'
+        '404':
+          description: Not Found
+          schema:
+            type: object
+            properties: {}
+      operationId: get-users-user_id-followees
+      description: フォローしているユーザー一覧
 schemes:
   - http
 definitions:
@@ -363,3 +385,11 @@ definitions:
     properties:
       followee_id:
         type: integer
+  Followees:
+    title: Followees
+    type: object
+    properties:
+      followees:
+        type: array
+        items:
+          $ref: '#/definitions/User'

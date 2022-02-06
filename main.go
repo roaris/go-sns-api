@@ -43,6 +43,7 @@ func main() {
 	v1r.Methods(http.MethodPatch).Path("/users/me").Handler(authMiddleware(AppHandler{handlers.UpdateLoginUser}))
 	v1r.Methods(http.MethodPost).Path("/auth").Handler(AppHandler{handlers.Authenticate})
 	v1r.Methods(http.MethodPost).Path("/users/me/followees").Handler(authMiddleware(AppHandler{handlers.CreateFollowee}))
+	v1r.Methods(http.MethodGet).Path("/users/{id:[0-9]+}/followees").Handler(AppHandler{handlers.GetFollowees})
 	v1r.Methods(http.MethodDelete).Path("/users/me/followees/{id:[0-9]+}").Handler(authMiddleware(AppHandler{handlers.DeleteFollowee}))
 	http.ListenAndServe(":8080", c.Handler(r))
 }

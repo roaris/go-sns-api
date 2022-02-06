@@ -41,6 +41,24 @@ func CreateFollowee(w http.ResponseWriter, r *http.Request) (int, interface{}, e
 	return http.StatusNoContent, nil, nil
 }
 
+func GetFollowees(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+	vars := mux.Vars(r)
+	userID, err := strconv.ParseInt(vars["id"], 10, 64)
+	if err != nil {
+		return http.StatusBadRequest, nil, err
+	}
+
+	followees, err := models.GetFollowees(userID)
+	if err != nil {
+		return http.StatusNotFound, nil, err
+	}
+	var resFollowees []*gen.User
+	for _, f := range followees {
+		resFollowees = append(resFollowees, f.SwaggerModel())
+	}
+	return http.StatusOK, gen.Followees{Followees: resFollowees}, nil
+}
+
 func DeleteFollowee(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	followerID := httputils.GetUserIDFromContext(r.Context())
 	vars := mux.Vars(r)
