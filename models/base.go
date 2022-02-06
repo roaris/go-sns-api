@@ -29,7 +29,8 @@ func init() {
 		log.Fatalln(err)
 	}
 
-	db.LogMode(true)                                                                     // ログの出力
-	db.AutoMigrate(&User{})                                                              // usersテーブルの作成
-	db.AutoMigrate(&Post{}).AddForeignKey("user_id", "users(id)", "CASCADE", "RESTRICT") // postsテーブルの作成, 対応するuserが削除されたらpostも削除される(CASCADE), user_idの更新は認めない(RESTRICT)
+	db.LogMode(true)                                                                                                                                                                                                                // ログの出力
+	db.AutoMigrate(&User{})                                                                                                                                                                                                         // usersテーブルの作成
+	db.AutoMigrate(&Post{}).AddForeignKey("user_id", "users(id)", "CASCADE", "RESTRICT")                                                                                                                                            // postsテーブルの作成, 対応するuserが削除されたらpostも削除される(CASCADE), user_idの更新は認めない(RESTRICT)
+	db.AutoMigrate(&Friendship{}).AddForeignKey("followee_id", "users(id)", "CASCADE", "RESTRICT").AddForeignKey("follower_id", "users(id)", "CASCADE", "RESTRICT").AddUniqueIndex("idx_friendships", "follower_id", "followee_id") // friendshipsテーブルの作成
 }
