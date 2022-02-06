@@ -248,6 +248,28 @@ paths:
             $ref: '#/definitions/CreateFolloweeRequest'
       tags:
         - Friendship
+  '/users/me/followees/{user_id}':
+    parameters:
+      - type: string
+        name: user_id
+        in: path
+        required: true
+    delete:
+      summary: ''
+      operationId: delete-users-me-followees-user_id
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+          schema:
+            type: object
+            properties: {}
+      description: アンフォローする
+      security:
+        - Authorization: []
+      tags:
+        - Friendship
 schemes:
   - http
 definitions:

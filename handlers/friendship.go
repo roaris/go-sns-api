@@ -3,7 +3,9 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/roaris/go-sns-api/httputils"
 	"github.com/roaris/go-sns-api/models"
 
@@ -34,6 +36,21 @@ func CreateFollowee(w http.ResponseWriter, r *http.Request) (int, interface{}, e
 		} else if errMessage == "forbidden follow" {
 			return http.StatusBadRequest, nil, err
 		}
+	}
+
+	return http.StatusNoContent, nil, nil
+}
+
+func DeleteFollowee(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+	followerID := httputils.GetUserIDFromContext(r.Context())
+	vars := mux.Vars(r)
+	followeeID, err := strconv.ParseInt(vars["id"], 10, 64)
+	if err != nil {
+		return http.StatusBadRequest, nil, err
+	}
+
+	if err = models.DeleteFollowee(followerID, followeeID); err != nil {
+		return http.StatusNotFound, nil, err
 	}
 
 	return http.StatusNoContent, nil, nil

@@ -18,3 +18,13 @@ func CreateFollowee(followerID int64, followeeID int64) error {
 	}).Error
 	return err
 }
+
+func DeleteFollowee(followerID int64, followeeID int64) error {
+	var friendship Friendship
+	err := db.First(&friendship, "follower_id=? and followee_id=?", followerID, followeeID).Error
+	if err != nil {
+		return err
+	}
+	db.Delete(&friendship)
+	return nil
+}
