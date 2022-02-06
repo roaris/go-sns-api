@@ -33,12 +33,7 @@ func GetFollowees(followerID int64) ([]User, error) {
 		followeeIDs = append(followeeIDs, f.FolloweeID)
 	}
 	var followees []User
-	// GormのIN句が動作しないため、仕方なくfor文
-	for _, i := range followeeIDs {
-		var followee User
-		db.First(&followee, "id=?", i)
-		followees = append(followees, followee)
-	}
+	db.Find(&followees, "id IN (?)", followeeIDs)
 	return followees, nil
 }
 
@@ -56,12 +51,7 @@ func GetFollowers(followeeID int64) ([]User, error) {
 		followerIDs = append(followerIDs, f.FollowerID)
 	}
 	var followers []User
-	// GormのIN句が動作しないため、仕方なくfor文
-	for _, i := range followerIDs {
-		var follower User
-		db.First(&follower, "id=?", i)
-		followers = append(followers, follower)
-	}
+	db.Find(&followers, "id IN (?)", followerIDs)
 	return followers, nil
 }
 
