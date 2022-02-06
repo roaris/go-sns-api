@@ -277,7 +277,7 @@ paths:
         in: path
         required: true
     get:
-      summary: Your GET endpoint
+      summary: ''
       tags:
         - Friendship
       responses:
