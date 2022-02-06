@@ -42,5 +42,6 @@ func main() {
 	v1r.Methods(http.MethodGet).Path("/users/me").Handler(authMiddleware(AppHandler{handlers.GetLoginUser}))
 	v1r.Methods(http.MethodPatch).Path("/users/me").Handler(authMiddleware(AppHandler{handlers.UpdateLoginUser}))
 	v1r.Methods(http.MethodPost).Path("/auth").Handler(AppHandler{handlers.Authenticate})
+	v1r.Methods(http.MethodPost).Path("/users/me/followees").Handler(authMiddleware(AppHandler{handlers.CreateFollowee}))
 	http.ListenAndServe(":8080", c.Handler(r))
 }

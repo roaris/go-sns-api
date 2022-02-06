@@ -220,6 +220,34 @@ paths:
         - User
       security:
         - Authorization: []
+  /users/me/followees:
+    parameters: []
+    post:
+      summary: ''
+      operationId: post-users-user_id-followees
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+          schema:
+            type: object
+            properties: {}
+        '409':
+          description: Conflict
+          schema:
+            type: object
+            properties: {}
+      description: フォローする
+      security:
+        - Authorization: []
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/CreateFolloweeRequest'
+      tags:
+        - Friendship
 schemes:
   - http
 definitions:
@@ -307,3 +335,9 @@ definitions:
         type: string
         minLength: 1
         maxLength: 140
+  CreateFolloweeRequest:
+    title: CreateFolloweeRequest
+    type: object
+    properties:
+      followee_id:
+        type: integer
