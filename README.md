@@ -41,6 +41,7 @@ pong
 | /api/v1/users/:id/followees | GET | ユーザーのフォロイー一覧 | NO
 | /api/v1/users/:id/followers | GET | ユーザーのフォロワー一覧 | NO
 | /api/v1/posts/:id | GET | 投稿取得 | NO
+| /api/v1/posts | GET | タイムライン取得 | YES
 | /api/v1/posts | POST | 投稿作成 | YES
 | /api/v1/posts/:id | PATCH | 投稿編集 | YES
 | /api/v1/posts/:id | DELETE | 投稿削除 | YES
