@@ -123,6 +123,19 @@ paths:
         - Post
       security:
         - Authorization: []
+    get:
+      summary: ''
+      operationId: get-timeline
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/PostsAndUsers'
+      description: タイムライン取得
+      security:
+        - Authorization: []
+      tags:
+        - Post
   /auth:
     post:
       summary: ''
@@ -423,3 +436,11 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/User'
+  PostsAndUsers:
+    title: PostsAndUsers
+    type: object
+    properties:
+      posts_and_users:
+        type: array
+        items:
+          $ref: '#/definitions/PostAndUser'

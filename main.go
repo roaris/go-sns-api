@@ -36,6 +36,7 @@ func main() {
 	authMiddleware := middlewares.AuthMiddleware
 	v1r.Methods(http.MethodPost).Path("/posts").Handler(authMiddleware(AppHandler{handlers.CreatePost}))
 	v1r.Methods(http.MethodGet).Path("/posts/{id:[0-9]+}").Handler(AppHandler{handlers.GetPost})
+	v1r.Methods(http.MethodGet).Path("/posts").Handler(authMiddleware(AppHandler{handlers.GetPosts}))
 	v1r.Methods(http.MethodPatch).Path("/posts/{id:[0-9]+}").Handler(authMiddleware(AppHandler{handlers.UpdatePost}))
 	v1r.Methods(http.MethodDelete).Path("/posts/{id:[0-9]+}").Handler(authMiddleware(AppHandler{handlers.DeletePost}))
 	v1r.Methods(http.MethodPost).Path("/users").Handler(AppHandler{handlers.CreateUser})

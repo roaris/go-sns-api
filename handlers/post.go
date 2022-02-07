@@ -54,6 +54,16 @@ func GetPost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 		nil
 }
 
+func GetPosts(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+	userID := httputils.GetUserIDFromContext(r.Context())
+	posts, users := models.GetPosts(userID)
+	var resPostsAndUsers []*gen.PostAndUser
+	for i := 0; i < len(posts); i++ {
+		resPostsAndUsers = append(resPostsAndUsers, &gen.PostAndUser{Post: posts[i].SwaggerModel(), User: users[i].SwaggerModel()})
+	}
+	return http.StatusOK, gen.PostsAndUsers{PostsAndUsers: resPostsAndUsers}, nil
+}
+
 func UpdatePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// パスパラメータの取得
 	vars := mux.Vars(r)

@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"sort"
 	"time"
 
 	"github.com/go-openapi/strfmt"
@@ -36,6 +37,25 @@ func GetPost(id int64) (post Post, err error) {
 	db.Model(&post).Association("User").Find(&user)
 	post.User = &user
 	return post, err
+}
+
+// タイムラインの取得
+func GetPosts(userID int64) (posts []Post, users []User) {
+	var friendships []Friendship
+	db.Find(&friendships, "follower_id=?", userID)
+	var followee_ids []int64
+	for _, f := range friendships {
+		followee_ids = append(followee_ids, f.FolloweeID)
+	}
+	db.Find(&posts, "user_id IN (?)", append(followee_ids, userID))
+	sort.Slice(posts, func(i, j int) bool { return posts[i].ID < posts[j].ID })
+	// N+1
+	for _, post := range posts {
+		var user User
+		db.First(&user, "id=?", post.UserID)
+		users = append(users, user)
+	}
+	return posts, users
 }
 
 func CreatePost(userID int64, content string) (post Post, err error) {
