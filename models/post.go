@@ -39,21 +39,15 @@ func GetPost(id int64) (post Post, err error) {
 }
 
 // タイムラインの取得
-func GetPosts(userID int64, limit int64, offset int64) (posts []Post, users []User) {
+func GetPosts(userID int64, limit int64, offset int64) (posts []Post) {
 	var friendships []Friendship
 	db.Find(&friendships, "follower_id=?", userID)
 	var followee_ids []int64
 	for _, f := range friendships {
 		followee_ids = append(followee_ids, f.FolloweeID)
 	}
-	db.Limit(limit).Offset(offset).Order("created_at").Find(&posts, "user_id IN (?)", append(followee_ids, userID))
-	// N+1
-	for _, post := range posts {
-		var user User
-		db.First(&user, "id=?", post.UserID)
-		users = append(users, user)
-	}
-	return posts, users
+	db.Preload("User").Limit(limit).Offset(offset).Order("created_at").Find(&posts, "user_id IN (?)", append(followee_ids, userID))
+	return posts
 }
 
 func CreatePost(userID int64, content string) (post Post, err error) {

@@ -59,10 +59,10 @@ func GetPosts(w http.ResponseWriter, r *http.Request) (int, interface{}, error) 
 	q := r.URL.Query()
 	limit, _ := strconv.ParseInt(q["limit"][0], 10, 64)
 	offset, _ := strconv.ParseInt(q["offset"][0], 10, 64)
-	posts, users := models.GetPosts(userID, limit, offset)
+	posts := models.GetPosts(userID, limit, offset)
 	var resPostsAndUsers []*gen.PostAndUser
 	for i := 0; i < len(posts); i++ {
-		resPostsAndUsers = append(resPostsAndUsers, &gen.PostAndUser{Post: posts[i].SwaggerModel(), User: users[i].SwaggerModel()})
+		resPostsAndUsers = append(resPostsAndUsers, &gen.PostAndUser{Post: posts[i].SwaggerModel(), User: posts[i].User.SwaggerModel()})
 	}
 	return http.StatusOK, gen.PostsAndUsers{PostsAndUsers: resPostsAndUsers}, nil
 }
