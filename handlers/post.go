@@ -54,6 +54,25 @@ func GetPost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 		nil
 }
 
+func GetPosts(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+	userID := httputils.GetUserIDFromContext(r.Context())
+	q := r.URL.Query()
+	limit, err := strconv.ParseInt(q["limit"][0], 10, 64)
+	if err != nil {
+		return http.StatusBadRequest, nil, err
+	}
+	offset, err := strconv.ParseInt(q["offset"][0], 10, 64)
+	if err != nil {
+		return http.StatusBadRequest, nil, err
+	}
+	posts := models.GetPosts(userID, limit, offset)
+	var resPostsAndUsers []*gen.PostAndUser
+	for _, post := range posts {
+		resPostsAndUsers = append(resPostsAndUsers, &gen.PostAndUser{Post: post.SwaggerModel(), User: post.User.SwaggerModel()})
+	}
+	return http.StatusOK, gen.PostsAndUsers{PostsAndUsers: resPostsAndUsers}, nil
+}
+
 func UpdatePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// パスパラメータの取得
 	vars := mux.Vars(r)
