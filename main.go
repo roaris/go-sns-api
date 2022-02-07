@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/roaris/go-sns-api/handlers"
@@ -57,5 +58,6 @@ func main() {
 	v1r.Methods(http.MethodDelete).Path("/users/me/followees/{id:[0-9]+}").Handler(authMiddleware(AppHandler{friendshipHandler.Destroy}))
 	v1r.Methods(http.MethodPost).Path("/posts/{id:[0-9]+}/likes").Handler(authMiddleware(AppHandler{likeHandler.Create}))
 	v1r.Methods(http.MethodDelete).Path("/posts/{id:[0-9]+}/likes").Handler(authMiddleware(AppHandler{likeHandler.Destroy}))
-	http.ListenAndServe(":8080", c.Handler(r))
+	// http.ListenAndServe(":8080", c.Handler(r))
+	http.ListenAndServe(":"+os.Getenv("PORT"), c.Handler(r))
 }
