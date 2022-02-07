@@ -57,8 +57,14 @@ func GetPost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 func GetPosts(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	userID := httputils.GetUserIDFromContext(r.Context())
 	q := r.URL.Query()
-	limit, _ := strconv.ParseInt(q["limit"][0], 10, 64)
-	offset, _ := strconv.ParseInt(q["offset"][0], 10, 64)
+	limit, err := strconv.ParseInt(q["limit"][0], 10, 64)
+	if err != nil {
+		return http.StatusBadRequest, nil, err
+	}
+	offset, err := strconv.ParseInt(q["offset"][0], 10, 64)
+	if err != nil {
+		return http.StatusBadRequest, nil, err
+	}
 	posts := models.GetPosts(userID, limit, offset)
 	var resPostsAndUsers []*gen.PostAndUser
 	for i := 0; i < len(posts); i++ {
