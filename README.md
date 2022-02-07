@@ -22,6 +22,13 @@ Swagger: [localhost:8081](http://localhost:8081)
 
 検証が終わったら、`docker-compose down`
 
+## 本番環境
+デプロイ先: https://go-sns-api.herokuapp.com/
+```
+$ curl https://go-sns-api.herokuapp.com/ping
+pong
+```
+
 ## エンドポイント一覧
 | パス | HTTPメソッド | 概要 | トークン保護
 | :-- | :-- | :-- | :--
