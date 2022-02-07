@@ -136,6 +136,15 @@ paths:
         - Authorization: []
       tags:
         - Post
+      parameters:
+        - type: integer
+          in: query
+          name: limit
+          required: true
+        - type: integer
+          in: query
+          name: offset
+          required: true
   /auth:
     post:
       summary: ''
