@@ -67,8 +67,8 @@ func GetPosts(w http.ResponseWriter, r *http.Request) (int, interface{}, error) 
 	}
 	posts := models.GetPosts(userID, limit, offset)
 	var resPostsAndUsers []*gen.PostAndUser
-	for i := 0; i < len(posts); i++ {
-		resPostsAndUsers = append(resPostsAndUsers, &gen.PostAndUser{Post: posts[i].SwaggerModel(), User: posts[i].User.SwaggerModel()})
+	for _, post := range posts {
+		resPostsAndUsers = append(resPostsAndUsers, &gen.PostAndUser{Post: post.SwaggerModel(), User: post.User.SwaggerModel()})
 	}
 	return http.StatusOK, gen.PostsAndUsers{PostsAndUsers: resPostsAndUsers}, nil
 }
