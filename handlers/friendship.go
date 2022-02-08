@@ -6,13 +6,22 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/jinzhu/gorm"
 	"github.com/roaris/go-sns-api/httputils"
 	"github.com/roaris/go-sns-api/models"
 
 	"github.com/roaris/go-sns-api/swagger/gen"
 )
 
-func CreateFollowee(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+type FriendshipHandler struct {
+	db *gorm.DB
+}
+
+func NewFriendshipHandler(db *gorm.DB) *FriendshipHandler {
+	return &FriendshipHandler{db}
+}
+
+func (f *FriendshipHandler) Create(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	if r.Header.Get("Content-Type") != "application/json" {
 		return http.StatusBadRequest, nil, nil
 	}
@@ -25,7 +34,7 @@ func CreateFollowee(w http.ResponseWriter, r *http.Request) (int, interface{}, e
 	}
 
 	userID := httputils.GetUserIDFromContext(r.Context())
-	if err := models.CreateFollowee(userID, createFolloweeRequest.FolloweeID); err != nil {
+	if err := models.CreateFollowee(f.db, userID, createFolloweeRequest.FolloweeID); err != nil {
 		errCode := "Error XXXX"
 		l := len(errCode)
 		errMessage := err.Error()
@@ -41,14 +50,14 @@ func CreateFollowee(w http.ResponseWriter, r *http.Request) (int, interface{}, e
 	return http.StatusNoContent, nil, nil
 }
 
-func GetFollowees(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (f *FriendshipHandler) ShowFollowees(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	vars := mux.Vars(r)
 	userID, err := strconv.ParseInt(vars["id"], 10, 64)
 	if err != nil {
 		return http.StatusBadRequest, nil, err
 	}
 
-	followees, err := models.GetFollowees(userID)
+	followees, err := models.GetFollowees(f.db, userID)
 	if err != nil {
 		return http.StatusNotFound, nil, err
 	}
@@ -59,14 +68,14 @@ func GetFollowees(w http.ResponseWriter, r *http.Request) (int, interface{}, err
 	return http.StatusOK, gen.Followees{Followees: resFollowees}, nil
 }
 
-func GetFollowers(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (f *FriendshipHandler) ShowFollowers(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	vars := mux.Vars(r)
 	userID, err := strconv.ParseInt(vars["id"], 10, 64)
 	if err != nil {
 		return http.StatusBadRequest, nil, err
 	}
 
-	followers, err := models.GetFollowers(userID)
+	followers, err := models.GetFollowers(f.db, userID)
 	if err != nil {
 		return http.StatusNotFound, nil, err
 	}
@@ -77,7 +86,7 @@ func GetFollowers(w http.ResponseWriter, r *http.Request) (int, interface{}, err
 	return http.StatusOK, gen.Followers{Followers: resFollowers}, nil
 }
 
-func DeleteFollowee(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (f *FriendshipHandler) Destroy(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	followerID := httputils.GetUserIDFromContext(r.Context())
 	vars := mux.Vars(r)
 	followeeID, err := strconv.ParseInt(vars["id"], 10, 64)
@@ -85,7 +94,7 @@ func DeleteFollowee(w http.ResponseWriter, r *http.Request) (int, interface{}, e
 		return http.StatusBadRequest, nil, err
 	}
 
-	if err = models.DeleteFollowee(followerID, followeeID); err != nil {
+	if err = models.DeleteFollowee(f.db, followerID, followeeID); err != nil {
 		return http.StatusNotFound, nil, err
 	}
 

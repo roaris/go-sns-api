@@ -1,6 +1,10 @@
 package models
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/jinzhu/gorm"
+)
 
 type Friendship struct {
 	ID         int64
@@ -8,7 +12,7 @@ type Friendship struct {
 	FolloweeID int64
 }
 
-func CreateFollowee(followerID int64, followeeID int64) error {
+func CreateFollowee(db *gorm.DB, followerID int64, followeeID int64) error {
 	if followerID == followeeID {
 		return errors.New("forbidden follow")
 	}
@@ -19,7 +23,7 @@ func CreateFollowee(followerID int64, followeeID int64) error {
 	return err
 }
 
-func GetFollowees(followerID int64) ([]User, error) {
+func GetFollowees(db *gorm.DB, followerID int64) ([]User, error) {
 	var user User
 	err := db.First(&user, "id=?", followerID).Error
 	if err != nil {
@@ -37,7 +41,7 @@ func GetFollowees(followerID int64) ([]User, error) {
 	return followees, nil
 }
 
-func GetFollowers(followeeID int64) ([]User, error) {
+func GetFollowers(db *gorm.DB, followeeID int64) ([]User, error) {
 	var user User
 	err := db.First(&user, "id=?", followeeID).Error
 	if err != nil {
@@ -55,7 +59,7 @@ func GetFollowers(followeeID int64) ([]User, error) {
 	return followers, nil
 }
 
-func DeleteFollowee(followerID int64, followeeID int64) error {
+func DeleteFollowee(db *gorm.DB, followerID int64, followeeID int64) error {
 	var friendship Friendship
 	err := db.First(&friendship, "follower_id=? and followee_id=?", followerID, followeeID).Error
 	if err != nil {

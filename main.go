@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/roaris/go-sns-api/handlers"
 	"github.com/roaris/go-sns-api/middlewares"
+	"github.com/roaris/go-sns-api/models"
 	"github.com/rs/cors"
 )
 
@@ -31,21 +32,27 @@ func main() {
 		},
 	})
 
+	db := models.CreateDB()
+	authHandler := handlers.NewAuthHandler(db)
+	friendshipHandler := handlers.NewFriendshipHandler(db)
+	postHandler := handlers.NewPostHandler(db)
+	userHandler := handlers.NewUserHandler(db)
+
 	v1r := r.PathPrefix("/api/v1").Subrouter()
 
 	authMiddleware := middlewares.AuthMiddleware
-	v1r.Methods(http.MethodPost).Path("/posts").Handler(authMiddleware(AppHandler{handlers.CreatePost}))
-	v1r.Methods(http.MethodGet).Path("/posts/{id:[0-9]+}").Handler(AppHandler{handlers.GetPost})
-	v1r.Methods(http.MethodGet).Path("/posts").Queries("limit", "{limit:[0-9]+}", "offset", "{offset:[0-9]+}").Handler(authMiddleware(AppHandler{handlers.GetPosts}))
-	v1r.Methods(http.MethodPatch).Path("/posts/{id:[0-9]+}").Handler(authMiddleware(AppHandler{handlers.UpdatePost}))
-	v1r.Methods(http.MethodDelete).Path("/posts/{id:[0-9]+}").Handler(authMiddleware(AppHandler{handlers.DeletePost}))
-	v1r.Methods(http.MethodPost).Path("/users").Handler(AppHandler{handlers.CreateUser})
-	v1r.Methods(http.MethodGet).Path("/users/me").Handler(authMiddleware(AppHandler{handlers.GetLoginUser}))
-	v1r.Methods(http.MethodPatch).Path("/users/me").Handler(authMiddleware(AppHandler{handlers.UpdateLoginUser}))
-	v1r.Methods(http.MethodPost).Path("/auth").Handler(AppHandler{handlers.Authenticate})
-	v1r.Methods(http.MethodPost).Path("/users/me/followees").Handler(authMiddleware(AppHandler{handlers.CreateFollowee}))
-	v1r.Methods(http.MethodGet).Path("/users/{id:[0-9]+}/followees").Handler(AppHandler{handlers.GetFollowees})
-	v1r.Methods(http.MethodGet).Path("/users/{id:[0-9]+}/followers").Handler(AppHandler{handlers.GetFollowers})
-	v1r.Methods(http.MethodDelete).Path("/users/me/followees/{id:[0-9]+}").Handler(authMiddleware(AppHandler{handlers.DeleteFollowee}))
+	v1r.Methods(http.MethodPost).Path("/posts").Handler(authMiddleware(AppHandler{postHandler.Create}))
+	v1r.Methods(http.MethodGet).Path("/posts/{id:[0-9]+}").Handler(AppHandler{postHandler.Show})
+	v1r.Methods(http.MethodGet).Path("/posts").Queries("limit", "{limit:[0-9]+}", "offset", "{offset:[0-9]+}").Handler(authMiddleware(AppHandler{postHandler.Index}))
+	v1r.Methods(http.MethodPatch).Path("/posts/{id:[0-9]+}").Handler(authMiddleware(AppHandler{postHandler.Update}))
+	v1r.Methods(http.MethodDelete).Path("/posts/{id:[0-9]+}").Handler(authMiddleware(AppHandler{postHandler.Destroy}))
+	v1r.Methods(http.MethodPost).Path("/users").Handler(AppHandler{userHandler.Create})
+	v1r.Methods(http.MethodGet).Path("/users/me").Handler(authMiddleware(AppHandler{userHandler.ShowMe}))
+	v1r.Methods(http.MethodPatch).Path("/users/me").Handler(authMiddleware(AppHandler{userHandler.UpdateMe}))
+	v1r.Methods(http.MethodPost).Path("/auth").Handler(AppHandler{authHandler.Authenticate})
+	v1r.Methods(http.MethodPost).Path("/users/me/followees").Handler(authMiddleware(AppHandler{friendshipHandler.Create}))
+	v1r.Methods(http.MethodGet).Path("/users/{id:[0-9]+}/followees").Handler(AppHandler{friendshipHandler.ShowFollowees})
+	v1r.Methods(http.MethodGet).Path("/users/{id:[0-9]+}/followers").Handler(AppHandler{friendshipHandler.ShowFollowers})
+	v1r.Methods(http.MethodDelete).Path("/users/me/followees/{id:[0-9]+}").Handler(authMiddleware(AppHandler{friendshipHandler.Destroy}))
 	http.ListenAndServe(":8080", c.Handler(r))
 }
