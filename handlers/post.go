@@ -13,7 +13,15 @@ import (
 	"github.com/roaris/go-sns-api/swagger/gen"
 )
 
-func CreatePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+type PostHandler struct {
+	db *gorm.DB
+}
+
+func NewPostHandler(db *gorm.DB) *PostHandler {
+	return &PostHandler{db}
+}
+
+func (p *PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// application/jsonのみ受け付ける
 	if r.Header.Get("Content-Type") != "application/json" {
 		return http.StatusBadRequest, nil, nil
@@ -30,7 +38,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error
 	}
 
 	userID := httputils.GetUserIDFromContext(r.Context())
-	post, err := models.CreatePost(userID, createPostRequest.Content)
+	post, err := models.CreatePost(p.db, userID, createPostRequest.Content)
 
 	if err != nil {
 		return http.StatusBadRequest, nil, err
@@ -38,12 +46,12 @@ func CreatePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error
 	return http.StatusOK, post.SwaggerModel(), nil
 }
 
-func GetPost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (p *PostHandler) GetPost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// パスパラメータの取得
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 10, 64)
 
-	post, err := models.GetPost(id)
+	post, err := models.GetPost(p.db, id)
 	if gorm.IsRecordNotFoundError(err) {
 		return http.StatusNotFound, nil, err
 	}
@@ -54,7 +62,7 @@ func GetPost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 		nil
 }
 
-func GetPosts(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (p *PostHandler) GetPosts(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	userID := httputils.GetUserIDFromContext(r.Context())
 	q := r.URL.Query()
 	limit, err := strconv.ParseInt(q["limit"][0], 10, 64)
@@ -65,7 +73,7 @@ func GetPosts(w http.ResponseWriter, r *http.Request) (int, interface{}, error) 
 	if err != nil {
 		return http.StatusBadRequest, nil, err
 	}
-	posts := models.GetPosts(userID, limit, offset)
+	posts := models.GetPosts(p.db, userID, limit, offset)
 	var resPostsAndUsers []*gen.PostAndUser
 	for _, post := range posts {
 		resPostsAndUsers = append(resPostsAndUsers, &gen.PostAndUser{Post: post.SwaggerModel(), User: post.User.SwaggerModel()})
@@ -73,7 +81,7 @@ func GetPosts(w http.ResponseWriter, r *http.Request) (int, interface{}, error) 
 	return http.StatusOK, gen.PostsAndUsers{PostsAndUsers: resPostsAndUsers}, nil
 }
 
-func UpdatePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (p *PostHandler) UpdatePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// パスパラメータの取得
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 10, 64)
@@ -89,7 +97,7 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error
 	}
 
 	userID := httputils.GetUserIDFromContext(r.Context())
-	post, err := models.UpdatePost(id, userID, updatePostRequest.Content)
+	post, err := models.UpdatePost(p.db, id, userID, updatePostRequest.Content)
 
 	if gorm.IsRecordNotFoundError(err) {
 		return http.StatusNotFound, nil, err
@@ -100,13 +108,13 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error
 	return http.StatusOK, post.SwaggerModel(), nil
 }
 
-func DeletePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (p *PostHandler) DeletePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// パスパラメータの取得
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 10, 64)
 
 	userID := httputils.GetUserIDFromContext(r.Context())
-	err := models.DeletePost(id, userID)
+	err := models.DeletePost(p.db, id, userID)
 	if gorm.IsRecordNotFoundError(err) {
 		return http.StatusNotFound, nil, err
 	} else if err != nil && err.Error() == "forbidden delete" {

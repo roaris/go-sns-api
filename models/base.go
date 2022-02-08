@@ -10,9 +10,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var db *gorm.DB
-
-func init() {
+func CreateDB() (db *gorm.DB) {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatalln(err)
@@ -33,4 +31,6 @@ func init() {
 	db.AutoMigrate(&User{})                                                                                                                                                                                                         // usersテーブルの作成
 	db.AutoMigrate(&Post{}).AddForeignKey("user_id", "users(id)", "CASCADE", "RESTRICT")                                                                                                                                            // postsテーブルの作成, 対応するuserが削除されたらpostも削除される(CASCADE), user_idの更新は認めない(RESTRICT)
 	db.AutoMigrate(&Friendship{}).AddForeignKey("followee_id", "users(id)", "CASCADE", "RESTRICT").AddForeignKey("follower_id", "users(id)", "CASCADE", "RESTRICT").AddUniqueIndex("idx_friendships", "follower_id", "followee_id") // friendshipsテーブルの作成
+
+	return db
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/go-openapi/strfmt"
+	"github.com/jinzhu/gorm"
 	"github.com/roaris/go-sns-api/swagger/gen"
 )
 
@@ -27,7 +28,7 @@ func (p *Post) SwaggerModel() *gen.Post {
 	}
 }
 
-func GetPost(id int64) (post Post, err error) {
+func GetPost(db *gorm.DB, id int64) (post Post, err error) {
 	err = db.First(&post, "id=?", id).Error
 	if err != nil {
 		return post, err
@@ -39,7 +40,7 @@ func GetPost(id int64) (post Post, err error) {
 }
 
 // タイムラインの取得
-func GetPosts(userID int64, limit int64, offset int64) (posts []Post) {
+func GetPosts(db *gorm.DB, userID int64, limit int64, offset int64) (posts []Post) {
 	var friendships []Friendship
 	db.Find(&friendships, "follower_id=?", userID)
 	var followee_ids []int64
@@ -50,15 +51,15 @@ func GetPosts(userID int64, limit int64, offset int64) (posts []Post) {
 	return posts
 }
 
-func CreatePost(userID int64, content string) (post Post, err error) {
+func CreatePost(db *gorm.DB, userID int64, content string) (post Post, err error) {
 	post.UserID = userID
 	post.Content = content
 	db.Create(&post)
 	return post, nil
 }
 
-func UpdatePost(id int64, userID int64, content string) (post Post, err error) {
-	post, err = GetPost(id)
+func UpdatePost(db *gorm.DB, id int64, userID int64, content string) (post Post, err error) {
+	post, err = GetPost(db, id)
 	if err != nil {
 		return post, err
 	}
@@ -71,8 +72,8 @@ func UpdatePost(id int64, userID int64, content string) (post Post, err error) {
 	return post, nil
 }
 
-func DeletePost(id int64, userID int64) (err error) {
-	post, err := GetPost(id)
+func DeletePost(db *gorm.DB, id int64, userID int64) (err error) {
+	post, err := GetPost(db, id)
 	if err != nil {
 		return err
 	}

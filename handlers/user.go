@@ -5,13 +5,22 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/strfmt"
+	"github.com/jinzhu/gorm"
 	"github.com/roaris/go-sns-api/httputils"
 	"github.com/roaris/go-sns-api/swagger/gen"
 
 	"github.com/roaris/go-sns-api/models"
 )
 
-func CreateUser(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+type UserHandler struct {
+	db *gorm.DB
+}
+
+func NewUserHandler(db *gorm.DB) *UserHandler {
+	return &UserHandler{db}
+}
+
+func (u *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// application/jsonのみ受け付ける
 	if r.Header.Get("Content-Type") != "application/json" {
 		return http.StatusBadRequest, nil, nil
@@ -27,7 +36,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) (int, interface{}, error
 		return http.StatusBadRequest, nil, err
 	}
 
-	user, err := models.CreateUser(createUserRequest.Name, string(createUserRequest.Email), createUserRequest.Password)
+	user, err := models.CreateUser(u.db, createUserRequest.Name, string(createUserRequest.Email), createUserRequest.Password)
 	if err != nil {
 		return http.StatusConflict, nil, err
 	}
@@ -35,13 +44,13 @@ func CreateUser(w http.ResponseWriter, r *http.Request) (int, interface{}, error
 	return http.StatusOK, user.SwaggerModel(), nil
 }
 
-func GetLoginUser(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (u *UserHandler) GetLoginUser(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	userID := httputils.GetUserIDFromContext(r.Context())
-	user, _ := models.GetUserById(userID)
+	user, _ := models.GetUserById(u.db, userID)
 	return http.StatusOK, user.SwaggerModelWithEmail(), nil
 }
 
-func UpdateLoginUser(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (u *UserHandler) UpdateLoginUser(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	if r.Header.Get("Content-Type") != "application/json" {
 		return http.StatusBadRequest, nil, nil
 	}
@@ -57,6 +66,7 @@ func UpdateLoginUser(w http.ResponseWriter, r *http.Request) (int, interface{}, 
 
 	userID := httputils.GetUserIDFromContext(r.Context())
 	user := models.UpdateUser(
+		u.db,
 		userID,
 		updateUserRequest.Name,
 		string(updateUserRequest.Email),

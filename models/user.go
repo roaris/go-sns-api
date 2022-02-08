@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/jinzhu/gorm"
 	"github.com/roaris/go-sns-api/swagger/gen"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -36,7 +37,7 @@ func Encrypt(password string) string {
 	return string(hash)
 }
 
-func CreateUser(name string, email string, password string) (user User, err error) {
+func CreateUser(db *gorm.DB, name string, email string, password string) (user User, err error) {
 	user.Name = name
 	user.Email = email
 	user.Password = Encrypt(password)
@@ -47,18 +48,18 @@ func CreateUser(name string, email string, password string) (user User, err erro
 	return user, nil
 }
 
-func GetUserById(id int64) (user User, err error) {
+func GetUserById(db *gorm.DB, id int64) (user User, err error) {
 	err = db.First(&user, "id=?", id).Error
 	return user, err
 }
 
-func GetUserByEmail(email string) (user User, err error) {
+func GetUserByEmail(db *gorm.DB, email string) (user User, err error) {
 	err = db.First(&user, "email=?", email).Error
 	return user, err
 }
 
-func UpdateUser(id int64, name string, email string, password string) (user User) {
-	user, _ = GetUserById(id)
+func UpdateUser(db *gorm.DB, id int64, name string, email string, password string) (user User) {
+	user, _ = GetUserById(db, id)
 	userAfter := user
 	userAfter.Name = name
 	userAfter.Email = email

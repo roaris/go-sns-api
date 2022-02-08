@@ -7,9 +7,18 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/jinzhu/gorm"
 	"github.com/roaris/go-sns-api/models"
 	"golang.org/x/crypto/bcrypt"
 )
+
+type AuthHandler struct {
+	db *gorm.DB
+}
+
+func NewAuthHandler(db *gorm.DB) *AuthHandler {
+	return &AuthHandler{db}
+}
 
 type AuthRequest struct {
 	Email    string
@@ -35,7 +44,7 @@ func GenerateToken(userID int64, now time.Time) (string, error) {
 	return token.SignedString([]byte(os.Getenv("SECRET")))
 }
 
-func Authenticate(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (a *AuthHandler) Authenticate(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// application/jsonのみ受け付ける
 	if r.Header.Get("Content-Type") != "application/json" {
 		return http.StatusBadRequest, nil, nil
@@ -47,7 +56,7 @@ func Authenticate(w http.ResponseWriter, r *http.Request) (int, interface{}, err
 	var authRequest AuthRequest
 	json.Unmarshal(body, &authRequest)
 
-	user, err := models.GetUserByEmail(authRequest.Email)
+	user, err := models.GetUserByEmail(a.db, authRequest.Email)
 	if err != nil {
 		return http.StatusUnauthorized, nil, err
 	}
