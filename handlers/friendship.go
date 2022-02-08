@@ -21,7 +21,7 @@ func NewFriendshipHandler(db *gorm.DB) *FriendshipHandler {
 	return &FriendshipHandler{db}
 }
 
-func (f *FriendshipHandler) CreateFollowee(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (f *FriendshipHandler) Create(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	if r.Header.Get("Content-Type") != "application/json" {
 		return http.StatusBadRequest, nil, nil
 	}
@@ -50,7 +50,7 @@ func (f *FriendshipHandler) CreateFollowee(w http.ResponseWriter, r *http.Reques
 	return http.StatusNoContent, nil, nil
 }
 
-func (f *FriendshipHandler) GetFollowees(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (f *FriendshipHandler) ShowFollowees(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	vars := mux.Vars(r)
 	userID, err := strconv.ParseInt(vars["id"], 10, 64)
 	if err != nil {
@@ -68,7 +68,7 @@ func (f *FriendshipHandler) GetFollowees(w http.ResponseWriter, r *http.Request)
 	return http.StatusOK, gen.Followees{Followees: resFollowees}, nil
 }
 
-func (f *FriendshipHandler) GetFollowers(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (f *FriendshipHandler) ShowFollowers(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	vars := mux.Vars(r)
 	userID, err := strconv.ParseInt(vars["id"], 10, 64)
 	if err != nil {
@@ -86,7 +86,7 @@ func (f *FriendshipHandler) GetFollowers(w http.ResponseWriter, r *http.Request)
 	return http.StatusOK, gen.Followers{Followers: resFollowers}, nil
 }
 
-func (f *FriendshipHandler) DeleteFollowee(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (f *FriendshipHandler) Destroy(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	followerID := httputils.GetUserIDFromContext(r.Context())
 	vars := mux.Vars(r)
 	followeeID, err := strconv.ParseInt(vars["id"], 10, 64)

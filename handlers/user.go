@@ -20,7 +20,7 @@ func NewUserHandler(db *gorm.DB) *UserHandler {
 	return &UserHandler{db}
 }
 
-func (u *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (u *UserHandler) Create(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// application/jsonのみ受け付ける
 	if r.Header.Get("Content-Type") != "application/json" {
 		return http.StatusBadRequest, nil, nil
@@ -44,13 +44,13 @@ func (u *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) (int, i
 	return http.StatusOK, user.SwaggerModel(), nil
 }
 
-func (u *UserHandler) GetLoginUser(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (u *UserHandler) ShowMe(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	userID := httputils.GetUserIDFromContext(r.Context())
 	user, _ := models.GetUserById(u.db, userID)
 	return http.StatusOK, user.SwaggerModelWithEmail(), nil
 }
 
-func (u *UserHandler) UpdateLoginUser(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (u *UserHandler) UpdateMe(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	if r.Header.Get("Content-Type") != "application/json" {
 		return http.StatusBadRequest, nil, nil
 	}

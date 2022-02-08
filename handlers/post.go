@@ -21,7 +21,7 @@ func NewPostHandler(db *gorm.DB) *PostHandler {
 	return &PostHandler{db}
 }
 
-func (p *PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (p *PostHandler) Create(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// application/jsonのみ受け付ける
 	if r.Header.Get("Content-Type") != "application/json" {
 		return http.StatusBadRequest, nil, nil
@@ -46,7 +46,7 @@ func (p *PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) (int, i
 	return http.StatusOK, post.SwaggerModel(), nil
 }
 
-func (p *PostHandler) GetPost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (p *PostHandler) Show(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// パスパラメータの取得
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 10, 64)
@@ -62,7 +62,7 @@ func (p *PostHandler) GetPost(w http.ResponseWriter, r *http.Request) (int, inte
 		nil
 }
 
-func (p *PostHandler) GetPosts(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (p *PostHandler) Index(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	userID := httputils.GetUserIDFromContext(r.Context())
 	q := r.URL.Query()
 	limit, err := strconv.ParseInt(q["limit"][0], 10, 64)
@@ -81,7 +81,7 @@ func (p *PostHandler) GetPosts(w http.ResponseWriter, r *http.Request) (int, int
 	return http.StatusOK, gen.PostsAndUsers{PostsAndUsers: resPostsAndUsers}, nil
 }
 
-func (p *PostHandler) UpdatePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (p *PostHandler) Update(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// パスパラメータの取得
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 10, 64)
@@ -108,7 +108,7 @@ func (p *PostHandler) UpdatePost(w http.ResponseWriter, r *http.Request) (int, i
 	return http.StatusOK, post.SwaggerModel(), nil
 }
 
-func (p *PostHandler) DeletePost(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+func (p *PostHandler) Destroy(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// パスパラメータの取得
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 10, 64)
