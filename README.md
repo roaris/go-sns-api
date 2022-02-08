@@ -20,6 +20,8 @@ APIサーバー: [localhost:8080](http://localhost:8080)
 
 Swagger: [localhost:8081](http://localhost:8081)
 
+ハンドラのテスト: `docker-compose exec app go test ./handlers`
+
 検証が終わったら、`docker-compose down`
 
 ## 本番環境
