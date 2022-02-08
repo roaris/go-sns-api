@@ -18,6 +18,7 @@ services:
       - MYSQL_PASSWORD
     volumes:
       - data-dev:/var/lib/mysql
+      - .:/docker-entrypoint-initdb.d # test_db.sqlでテスト用のデータベースを作成する
     container_name: db-container
   swagger-ui:
     image: swaggerapi/swagger-ui
