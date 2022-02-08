@@ -36,12 +36,12 @@ func (u *UserHandler) Create(w http.ResponseWriter, r *http.Request) (int, inter
 		return http.StatusBadRequest, nil, err
 	}
 
-	user, err := models.CreateUser(u.db, createUserRequest.Name, string(createUserRequest.Email), createUserRequest.Password)
+	user, err := models.CreateUser(u.db, *createUserRequest.Name, string(*createUserRequest.Email), *createUserRequest.Password)
 	if err != nil {
 		return http.StatusConflict, nil, err
 	}
 
-	return http.StatusOK, user.SwaggerModel(), nil
+	return http.StatusCreated, user.SwaggerModel(), nil
 }
 
 func (u *UserHandler) ShowMe(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {

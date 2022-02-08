@@ -22,7 +22,7 @@ func TestCreateUser(t *testing.T) {
 		w := httptest.NewRecorder()
 		status, payload, err := userHandler.Create(w, r)
 
-		assert.Equal(t, 200, status)
+		assert.Equal(t, 201, status)
 		assert.Equal(t, "test", payload.(*gen.User).Name)
 		assert.Equal(t, nil, err)
 	})
