@@ -5,6 +5,8 @@ services:
     tty: true
     ports:
       - "8080:8080"
+    environment:
+      - CGO_ENABLED=0
     volumes:
       - .:/app # ボリュームマウント
   db:
