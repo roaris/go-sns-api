@@ -1,0 +1,11 @@
+name: test
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: handler-test
+        run: |
+          docker-compose up
+          docker-compose exec app go test ./handlers
