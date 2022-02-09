@@ -8,4 +8,4 @@ jobs:
       - name: handler-test
         run: |
           docker-compose up -d
-          docker-compose exec app go test ./handlers
+          docker-compose exec -T app go test ./handlers
