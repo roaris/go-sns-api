@@ -20,16 +20,19 @@ import (
 type UpdateUserRequest struct {
 
 	// email
+	// Required: true
 	// Format: email
-	Email strfmt.Email `json:"email,omitempty"`
+	Email *strfmt.Email `json:"email"`
 
 	// name
+	// Required: true
 	// Min Length: 3
-	Name string `json:"name,omitempty"`
+	Name *string `json:"name"`
 
 	// password
+	// Required: true
 	// Min Length: 6
-	Password string `json:"password,omitempty"`
+	Password *string `json:"password"`
 }
 
 // Validate validates this update user request
@@ -55,8 +58,9 @@ func (m *UpdateUserRequest) Validate(formats strfmt.Registry) error {
 }
 
 func (m *UpdateUserRequest) validateEmail(formats strfmt.Registry) error {
-	if swag.IsZero(m.Email) { // not required
-		return nil
+
+	if err := validate.Required("email", "body", m.Email); err != nil {
+		return err
 	}
 
 	if err := validate.FormatOf("email", "body", "email", m.Email.String(), formats); err != nil {
@@ -67,11 +71,12 @@ func (m *UpdateUserRequest) validateEmail(formats strfmt.Registry) error {
 }
 
 func (m *UpdateUserRequest) validateName(formats strfmt.Registry) error {
-	if swag.IsZero(m.Name) { // not required
-		return nil
+
+	if err := validate.Required("name", "body", m.Name); err != nil {
+		return err
 	}
 
-	if err := validate.MinLength("name", "body", m.Name, 3); err != nil {
+	if err := validate.MinLength("name", "body", *m.Name, 3); err != nil {
 		return err
 	}
 
@@ -79,11 +84,12 @@ func (m *UpdateUserRequest) validateName(formats strfmt.Registry) error {
 }
 
 func (m *UpdateUserRequest) validatePassword(formats strfmt.Registry) error {
-	if swag.IsZero(m.Password) { // not required
-		return nil
+
+	if err := validate.Required("password", "body", m.Password); err != nil {
+		return err
 	}
 
-	if err := validate.MinLength("password", "body", m.Password, 6); err != nil {
+	if err := validate.MinLength("password", "body", *m.Password, 6); err != nil {
 		return err
 	}
 
