@@ -38,12 +38,12 @@ func (p *PostHandler) Create(w http.ResponseWriter, r *http.Request) (int, inter
 	}
 
 	userID := httputils.GetUserIDFromContext(r.Context())
-	post, err := models.CreatePost(p.db, userID, createPostRequest.Content)
+	post, err := models.CreatePost(p.db, userID, *createPostRequest.Content)
 
 	if err != nil {
 		return http.StatusBadRequest, nil, err
 	}
-	return http.StatusOK, post.SwaggerModel(), nil
+	return http.StatusCreated, post.SwaggerModel(), nil
 }
 
 func (p *PostHandler) Show(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {

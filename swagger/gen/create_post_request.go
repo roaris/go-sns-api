@@ -20,9 +20,10 @@ import (
 type CreatePostRequest struct {
 
 	// content
+	// Required: true
 	// Max Length: 140
 	// Min Length: 1
-	Content string `json:"content,omitempty"`
+	Content *string `json:"content"`
 }
 
 // Validate validates this create post request
@@ -40,15 +41,16 @@ func (m *CreatePostRequest) Validate(formats strfmt.Registry) error {
 }
 
 func (m *CreatePostRequest) validateContent(formats strfmt.Registry) error {
-	if swag.IsZero(m.Content) { // not required
-		return nil
-	}
 
-	if err := validate.MinLength("content", "body", m.Content, 1); err != nil {
+	if err := validate.Required("content", "body", m.Content); err != nil {
 		return err
 	}
 
-	if err := validate.MaxLength("content", "body", m.Content, 140); err != nil {
+	if err := validate.MinLength("content", "body", *m.Content, 1); err != nil {
+		return err
+	}
+
+	if err := validate.MaxLength("content", "body", *m.Content, 140); err != nil {
 		return err
 	}
 
