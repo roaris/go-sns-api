@@ -386,6 +386,10 @@ definitions:
       password:
         type: string
         minLength: 6
+    required:
+      - name
+      - email
+      - password
   CreateUserRequest:
     title: CreateUserRequest
     type: object

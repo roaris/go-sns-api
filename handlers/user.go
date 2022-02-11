@@ -68,9 +68,9 @@ func (u *UserHandler) UpdateMe(w http.ResponseWriter, r *http.Request) (int, int
 	user := models.UpdateUser(
 		u.db,
 		userID,
-		updateUserRequest.Name,
-		string(updateUserRequest.Email),
-		updateUserRequest.Password,
+		*updateUserRequest.Name,
+		string(*updateUserRequest.Email),
+		*updateUserRequest.Password,
 	)
 
 	return http.StatusOK, user.SwaggerModelWithEmail(), nil
