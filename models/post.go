@@ -47,7 +47,8 @@ func GetPosts(db *gorm.DB, userID int64, limit int64, offset int64) (posts []Pos
 	for _, f := range friendships {
 		followee_ids = append(followee_ids, f.FolloweeID)
 	}
-	db.Preload("User").Limit(limit).Offset(offset).Order("created_at").Find(&posts, "user_id IN (?)", append(followee_ids, userID))
+	// idにはインデックスがついてるので、created_atでソートするよりも高速
+	db.Preload("User").Limit(limit).Offset(offset).Order("id").Find(&posts, "user_id IN (?)", append(followee_ids, userID))
 	return posts
 }
 

@@ -120,3 +120,66 @@ func TestShowPost(t *testing.T) {
 		assert.NotEqual(t, nil, err)
 	})
 }
+
+func TestIndexPost(t *testing.T) {
+	// フォローしているユーザーの投稿が見れるか
+	t.Run("ok", func(t *testing.T) {
+		db := models.CreateTestDB()
+		defer models.CleanUpTestDB(db)
+
+		user1, _ := models.CreateUser(db, "taro", "taro@example.com", "password")
+		user2, _ := models.CreateUser(db, "alice", "alice@example.com", "password")
+		user3, _ := models.CreateUser(db, "bob", "bob@example.com", "password")
+		post1, _ := models.CreatePost(db, user1.ID, "I'm happy.")
+		post2, _ := models.CreatePost(db, user2.ID, "I'm sad.")
+		models.CreatePost(db, user3.ID, "I'm angry.")
+		models.CreateFollowee(db, user1.ID, user2.ID)
+
+		postHandler := NewPostHandler(db)
+		r := httptest.NewRequest("GET", "/api/v1/posts?limit=5&offset=0", nil)
+		q := r.URL.Query()
+		q.Add("limit", "5")
+		q.Add("offset", "0")
+		ctx := httputils.SetUserIDToContext(r.Context(), user1.ID)
+		w := httptest.NewRecorder()
+		status, payload, err := postHandler.Index(w, r.WithContext(ctx))
+
+		assert.Equal(t, 200, status)
+		assert.Equal(t, 2, len(payload.(gen.PostsAndUsers).PostsAndUsers))
+		assert.Equal(t, post1.SwaggerModel().Content, payload.(gen.PostsAndUsers).PostsAndUsers[0].Post.Content)
+		assert.Equal(t, post2.SwaggerModel().Content, payload.(gen.PostsAndUsers).PostsAndUsers[1].Post.Content)
+		assert.Equal(t, nil, err)
+	})
+
+	// limitとoffsetが正しく動くか
+	t.Run("ok", func(t *testing.T) {
+		db := models.CreateTestDB()
+		defer models.CleanUpTestDB(db)
+
+		user1, _ := models.CreateUser(db, "taro", "taro@example.com", "password")
+		user2, _ := models.CreateUser(db, "alice", "alice@example.com", "password")
+		var posts []models.Post
+		for i := 0; i < 10; i++ {
+			post, _ := models.CreatePost(db, user1.ID, fmt.Sprintf("I'm happy%d.", i))
+			posts = append(posts, post)
+			post, _ = models.CreatePost(db, user2.ID, fmt.Sprintf("I'm sad%d.", i))
+			posts = append(posts, post)
+		}
+		models.CreateFollowee(db, user1.ID, user2.ID)
+
+		postHandler := NewPostHandler(db)
+		r := httptest.NewRequest("GET", "/api/v1/posts?limit=10&offset=5", nil)
+		q := r.URL.Query()
+		q.Add("limit", "10")
+		q.Add("offset", "5")
+		ctx := httputils.SetUserIDToContext(r.Context(), user1.ID)
+		w := httptest.NewRecorder()
+		status, payload, err := postHandler.Index(w, r.WithContext(ctx))
+
+		assert.Equal(t, 200, status)
+		assert.Equal(t, 10, len(payload.(gen.PostsAndUsers).PostsAndUsers))
+		assert.Equal(t, posts[5].Content, payload.(gen.PostsAndUsers).PostsAndUsers[0].Post.Content)
+		assert.Equal(t, posts[14].Content, payload.(gen.PostsAndUsers).PostsAndUsers[9].Post.Content)
+		assert.Equal(t, nil, err)
+	})
+}
