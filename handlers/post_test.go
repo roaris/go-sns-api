@@ -195,37 +195,27 @@ func TestUpdatePost(t *testing.T) {
 		postHandler := NewPostHandler(db)
 
 		// before
-		r := httptest.NewRequest("GET", fmt.Sprintf("/api/v1/posts/%d", post.ID), nil)
+		postBefore, _ := models.GetPost(db, post.ID)
+		assert.Equal(t, post.Content, postBefore.Content)
+
+		// 更新
+		rBody := strings.NewReader(`{"content":"I'm sad."}`)
+		r := httptest.NewRequest("PATCH", fmt.Sprintf("/api/v1/posts/%d", post.ID), rBody)
 		vars := map[string]string{
 			"id": strconv.FormatInt(post.ID, 10),
 		}
 		r = mux.SetURLVars(r, vars)
-		w := httptest.NewRecorder()
-		status, payload, err := postHandler.Show(w, r)
-
-		assert.Equal(t, 200, status)
-		assert.Equal(t, post.Content, payload.(gen.PostAndUser).Post.Content)
-		assert.Equal(t, nil, err)
-
-		// 更新
-		rBody := strings.NewReader(`{"content":"I'm sad."}`)
-		r = httptest.NewRequest("PATCH", fmt.Sprintf("/api/v1/posts/%d", post.ID), rBody)
-		r = mux.SetURLVars(r, vars)
 		ctx := httputils.SetUserIDToContext(r.Context(), user.ID)
-		status, payload, err = postHandler.Update(w, r.WithContext(ctx))
+		w := httptest.NewRecorder()
+		status, payload, err := postHandler.Update(w, r.WithContext(ctx))
 
 		assert.Equal(t, 200, status)
 		assert.Equal(t, "I'm sad.", payload.(*gen.Post).Content)
 		assert.Equal(t, nil, err)
 
 		// after
-		r = httptest.NewRequest("GET", fmt.Sprintf("/api/v1/posts/%d", post.ID), nil)
-		r = mux.SetURLVars(r, vars)
-		status, payload, err = postHandler.Show(w, r)
-
-		assert.Equal(t, 200, status)
-		assert.Equal(t, "I'm sad.", payload.(gen.PostAndUser).Post.Content)
-		assert.Equal(t, nil, err)
+		postAfter, _ := models.GetPost(db, post.ID)
+		assert.Equal(t, "I'm sad.", postAfter.Content)
 	})
 
 	t.Run("bad request", func(t *testing.T) {
@@ -238,37 +228,27 @@ func TestUpdatePost(t *testing.T) {
 		postHandler := NewPostHandler(db)
 
 		// before
-		r := httptest.NewRequest("GET", fmt.Sprintf("/api/v1/posts/%d", post.ID), nil)
+		postBefore, _ := models.GetPost(db, post.ID)
+		assert.Equal(t, post.Content, postBefore.Content)
+
+		// 更新
+		rBody := strings.NewReader(fmt.Sprintf(`{"content":"%s"}`, strings.Repeat("a", 141))) // 140文字より多い
+		r := httptest.NewRequest("PATCH", fmt.Sprintf("/api/v1/posts/%d", post.ID), rBody)
 		vars := map[string]string{
 			"id": strconv.FormatInt(post.ID, 10),
 		}
 		r = mux.SetURLVars(r, vars)
-		w := httptest.NewRecorder()
-		status, payload, err := postHandler.Show(w, r)
-
-		assert.Equal(t, 200, status)
-		assert.Equal(t, post.Content, payload.(gen.PostAndUser).Post.Content)
-		assert.Equal(t, nil, err)
-
-		// 更新
-		rBody := strings.NewReader(fmt.Sprintf(`{"content":"%s"}`, strings.Repeat("a", 141))) // 140文字より多い
-		r = httptest.NewRequest("PATCH", fmt.Sprintf("/api/v1/posts/%d", post.ID), rBody)
-		r = mux.SetURLVars(r, vars)
 		ctx := httputils.SetUserIDToContext(r.Context(), user.ID)
-		status, payload, err = postHandler.Update(w, r.WithContext(ctx))
+		w := httptest.NewRecorder()
+		status, payload, err := postHandler.Update(w, r.WithContext(ctx))
 
 		assert.Equal(t, 400, status)
 		assert.Equal(t, nil, payload)
 		assert.NotEqual(t, nil, err)
 
 		// after
-		r = httptest.NewRequest("GET", fmt.Sprintf("/api/v1/posts/%d", post.ID), nil)
-		r = mux.SetURLVars(r, vars)
-		status, payload, err = postHandler.Show(w, r)
-
-		assert.Equal(t, 200, status)
-		assert.Equal(t, post.Content, payload.(gen.PostAndUser).Post.Content)
-		assert.Equal(t, nil, err)
+		postAfter, _ := models.GetPost(db, post.ID)
+		assert.Equal(t, post.Content, postAfter.Content)
 	})
 
 	t.Run("forbidden", func(t *testing.T) {
@@ -282,37 +262,27 @@ func TestUpdatePost(t *testing.T) {
 		postHandler := NewPostHandler(db)
 
 		// before
-		r := httptest.NewRequest("GET", fmt.Sprintf("/api/v1/posts/%d", post.ID), nil)
+		postBefore, _ := models.GetPost(db, post.ID)
+		assert.Equal(t, post.Content, postBefore.Content)
+
+		// 更新
+		rBody := strings.NewReader(`{"content":"I'm sad."}`)
+		r := httptest.NewRequest("PATCH", fmt.Sprintf("/api/v1/posts/%d", post.ID), rBody)
 		vars := map[string]string{
 			"id": strconv.FormatInt(post.ID, 10),
 		}
 		r = mux.SetURLVars(r, vars)
-		w := httptest.NewRecorder()
-		status, payload, err := postHandler.Show(w, r)
-
-		assert.Equal(t, 200, status)
-		assert.Equal(t, post.Content, payload.(gen.PostAndUser).Post.Content)
-		assert.Equal(t, nil, err)
-
-		// 更新
-		rBody := strings.NewReader(`{"content":"I'm sad."}`)
-		r = httptest.NewRequest("PATCH", fmt.Sprintf("/api/v1/posts/%d", post.ID), rBody)
-		r = mux.SetURLVars(r, vars)
 		ctx := httputils.SetUserIDToContext(r.Context(), user2.ID)
-		status, payload, err = postHandler.Update(w, r.WithContext(ctx))
+		w := httptest.NewRecorder()
+		status, payload, err := postHandler.Update(w, r.WithContext(ctx))
 
 		assert.Equal(t, 403, status)
 		assert.Equal(t, nil, payload)
 		assert.NotEqual(t, nil, err)
 
 		// after
-		r = httptest.NewRequest("GET", fmt.Sprintf("/api/v1/posts/%d", post.ID), nil)
-		r = mux.SetURLVars(r, vars)
-		status, payload, err = postHandler.Show(w, r)
-
-		assert.Equal(t, 200, status)
-		assert.Equal(t, post.Content, payload.(gen.PostAndUser).Post.Content)
-		assert.Equal(t, nil, err)
+		postAfter, _ := models.GetPost(db, post.ID)
+		assert.Equal(t, post.Content, postAfter.Content)
 	})
 }
 
