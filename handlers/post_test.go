@@ -205,6 +205,7 @@ func TestUpdatePost(t *testing.T) {
 			"id": strconv.FormatInt(post.ID, 10),
 		}
 		r = mux.SetURLVars(r, vars)
+		r.Header.Add("Content-Type", "application/json")
 		ctx := httputils.SetUserIDToContext(r.Context(), user.ID)
 		w := httptest.NewRecorder()
 		status, payload, err := postHandler.Update(w, r.WithContext(ctx))
@@ -238,6 +239,7 @@ func TestUpdatePost(t *testing.T) {
 			"id": strconv.FormatInt(post.ID, 10),
 		}
 		r = mux.SetURLVars(r, vars)
+		r.Header.Add("Content-Type", "application/json")
 		ctx := httputils.SetUserIDToContext(r.Context(), user.ID)
 		w := httptest.NewRecorder()
 		status, payload, err := postHandler.Update(w, r.WithContext(ctx))
@@ -272,6 +274,7 @@ func TestUpdatePost(t *testing.T) {
 			"id": strconv.FormatInt(post.ID, 10),
 		}
 		r = mux.SetURLVars(r, vars)
+		r.Header.Add("Content-Type", "application/json")
 		ctx := httputils.SetUserIDToContext(r.Context(), user2.ID)
 		w := httptest.NewRecorder()
 		status, payload, err := postHandler.Update(w, r.WithContext(ctx))

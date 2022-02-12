@@ -86,6 +86,10 @@ func (p *PostHandler) Update(w http.ResponseWriter, r *http.Request) (int, inter
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 10, 64)
 
+	if r.Header.Get("Content-Type") != "application/json" {
+		return http.StatusBadRequest, nil, nil
+	}
+
 	// リクエストボディをPostRequestに変換する
 	body := make([]byte, r.ContentLength)
 	r.Body.Read(body)
