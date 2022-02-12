@@ -49,11 +49,6 @@ paths:
           schema:
             type: object
             properties: {}
-        '401':
-          description: Unauthorized
-          schema:
-            type: object
-            properties: {}
         '403':
           description: Forbidden
           schema:
@@ -105,8 +100,8 @@ paths:
       summary: ''
       operationId: post-posts
       responses:
-        '204':
-          description: No Content
+        '201':
+          description: Created
         '400':
           description: Bad Request
           schema:
@@ -423,6 +418,8 @@ definitions:
         type: string
         minLength: 1
         maxLength: 140
+    required:
+      - content
   UpdatePostRequest:
     title: UpdatePostRequest
     type: object
@@ -431,6 +428,8 @@ definitions:
         type: string
         minLength: 1
         maxLength: 140
+    required:
+      - content
   CreateFolloweeRequest:
     title: CreateFolloweeRequest
     type: object
