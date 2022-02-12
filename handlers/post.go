@@ -97,7 +97,7 @@ func (p *PostHandler) Update(w http.ResponseWriter, r *http.Request) (int, inter
 	}
 
 	userID := httputils.GetUserIDFromContext(r.Context())
-	post, err := models.UpdatePost(p.db, id, userID, updatePostRequest.Content)
+	post, err := models.UpdatePost(p.db, id, userID, *updatePostRequest.Content)
 
 	if gorm.IsRecordNotFoundError(err) {
 		return http.StatusNotFound, nil, err
