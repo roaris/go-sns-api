@@ -315,3 +315,72 @@ func TestUpdatePost(t *testing.T) {
 		assert.Equal(t, nil, err)
 	})
 }
+
+func TestDestroyPost(t *testing.T) {
+	t.Run("ok", func(t *testing.T) {
+		db := models.CreateTestDB()
+		defer models.CleanUpTestDB(db)
+
+		user, _ := models.CreateUser(db, "taro", "taro@example.com", "password")
+		post, _ := models.CreatePost(db, user.ID, "I'm happy.")
+
+		postHandler := NewPostHandler(db)
+
+		// before
+		var count int
+		db.Model(&models.Post{}).Count(&count)
+		assert.Equal(t, 1, count)
+
+		// 削除
+		r := httptest.NewRequest("DELETE", fmt.Sprintf("/api/v1/posts/%d", post.ID), nil)
+		vars := map[string]string{
+			"id": strconv.FormatInt(post.ID, 10),
+		}
+		r = mux.SetURLVars(r, vars)
+		w := httptest.NewRecorder()
+		ctx := httputils.SetUserIDToContext(r.Context(), user.ID)
+		status, payload, err := postHandler.Destroy(w, r.WithContext(ctx))
+
+		assert.Equal(t, 200, status)
+		assert.Equal(t, nil, payload)
+		assert.Equal(t, nil, err)
+
+		// after
+		db.Model(&models.Post{}).Count(&count)
+		assert.Equal(t, 0, count)
+	})
+
+	t.Run("forbidden", func(t *testing.T) {
+		db := models.CreateTestDB()
+		defer models.CleanUpTestDB(db)
+
+		user1, _ := models.CreateUser(db, "taro", "taro@example.com", "password")
+		user2, _ := models.CreateUser(db, "alice", "alice@example.com", "password")
+		post, _ := models.CreatePost(db, user1.ID, "I'm happy.")
+
+		postHandler := NewPostHandler(db)
+
+		// before
+		var count int
+		db.Model(&models.Post{}).Count(&count)
+		assert.Equal(t, 1, count)
+
+		// 削除
+		r := httptest.NewRequest("DELETE", fmt.Sprintf("/api/v1/posts/%d", post.ID), nil)
+		vars := map[string]string{
+			"id": strconv.FormatInt(post.ID, 10),
+		}
+		r = mux.SetURLVars(r, vars)
+		w := httptest.NewRecorder()
+		ctx := httputils.SetUserIDToContext(r.Context(), user2.ID)
+		status, payload, err := postHandler.Destroy(w, r.WithContext(ctx))
+
+		assert.Equal(t, 403, status)
+		assert.Equal(t, nil, payload)
+		assert.NotEqual(t, nil, err)
+
+		// after
+		db.Model(&models.Post{}).Count(&count)
+		assert.Equal(t, 1, count)
+	})
+}
