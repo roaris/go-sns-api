@@ -9,6 +9,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
 	"github.com/roaris/go-sns-api/models"
+	"github.com/roaris/go-sns-api/swagger/gen"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,11 +19,6 @@ type AuthHandler struct {
 
 func NewAuthHandler(db *gorm.DB) *AuthHandler {
 	return &AuthHandler{db}
-}
-
-type AuthRequest struct {
-	Email    string
-	Password string
 }
 
 type Token struct {
@@ -53,7 +49,7 @@ func (a *AuthHandler) Authenticate(w http.ResponseWriter, r *http.Request) (int,
 	// リクエストボディをAuthRequestに変換する
 	body := make([]byte, r.ContentLength)
 	r.Body.Read(body)
-	var authRequest AuthRequest
+	var authRequest gen.AuthRequest
 	json.Unmarshal(body, &authRequest)
 
 	user, err := models.GetUserByEmail(a.db, authRequest.Email)
