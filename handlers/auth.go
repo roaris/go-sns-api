@@ -9,6 +9,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
 	"github.com/roaris/go-sns-api/models"
+	"github.com/roaris/go-sns-api/swagger/gen"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -20,17 +21,12 @@ func NewAuthHandler(db *gorm.DB) *AuthHandler {
 	return &AuthHandler{db}
 }
 
-type AuthRequest struct {
-	Email    string
-	Password string
-}
-
 type Token struct {
 	Token string `json:"token"`
 }
 
 // JWTトークンを生成する
-func GenerateToken(userID int64, now time.Time) (string, error) {
+func generateToken(userID int64, now time.Time) (string, error) {
 	/*
 		HMAC SHA-256を使用 sub(subject):識別子 iat(issued at):発行時刻 exp(expiration):有効期限
 		iatとexpはUNIXタイムスタンプを使う
@@ -53,7 +49,7 @@ func (a *AuthHandler) Authenticate(w http.ResponseWriter, r *http.Request) (int,
 	// リクエストボディをAuthRequestに変換する
 	body := make([]byte, r.ContentLength)
 	r.Body.Read(body)
-	var authRequest AuthRequest
+	var authRequest gen.AuthRequest
 	json.Unmarshal(body, &authRequest)
 
 	user, err := models.GetUserByEmail(a.db, authRequest.Email)
@@ -68,6 +64,6 @@ func (a *AuthHandler) Authenticate(w http.ResponseWriter, r *http.Request) (int,
 	}
 
 	// トークンを返す
-	token, _ := GenerateToken(user.ID, time.Now())
+	token, _ := generateToken(user.ID, time.Now())
 	return http.StatusOK, Token{token}, nil
 }
