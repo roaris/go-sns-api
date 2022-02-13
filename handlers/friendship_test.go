@@ -3,11 +3,14 @@ package handlers
 import (
 	"fmt"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
 
+	"github.com/gorilla/mux"
 	"github.com/roaris/go-sns-api/httputils"
 	"github.com/roaris/go-sns-api/models"
+	"github.com/roaris/go-sns-api/swagger/gen"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -126,5 +129,99 @@ func TestCreateFollowee(t *testing.T) {
 		// after
 		afterFollowees, _ := models.GetFollowees(db, user.ID)
 		assert.Equal(t, 0, len(afterFollowees))
+	})
+}
+
+func TestShowFollowees(t *testing.T) {
+	t.Run("ok", func(t *testing.T) {
+		db := models.CreateTestDB()
+		defer models.CleanUpTestDB(db)
+
+		user1, _ := models.CreateUser(db, "alice", "alice@example.com", "password")
+		user2, _ := models.CreateUser(db, "bob", "bob@example.com", "password")
+		models.CreateFollowee(db, user1.ID, user2.ID)
+
+		friendshipHandler := NewFriendshipHandler(db)
+		r := httptest.NewRequest("GET", fmt.Sprintf("/api/v1/users/%d/followees", user1.ID), nil)
+		vars := map[string]string{
+			"id": strconv.FormatInt(user1.ID, 10),
+		}
+		r = mux.SetURLVars(r, vars)
+		w := httptest.NewRecorder()
+		status, payload, err := friendshipHandler.ShowFollowees(w, r)
+
+		assert.Equal(t, 200, status)
+		assert.Equal(t, 1, len(payload.(gen.Followees).Followees))
+		assert.Equal(t, user2.Name, payload.(gen.Followees).Followees[0].Name)
+		assert.Equal(t, nil, err)
+	})
+
+	t.Run("not found", func(t *testing.T) {
+		db := models.CreateTestDB()
+		defer models.CleanUpTestDB(db)
+
+		user1, _ := models.CreateUser(db, "alice", "alice@example.com", "password")
+		user2, _ := models.CreateUser(db, "bob", "bob@example.com", "password")
+		models.CreateFollowee(db, user1.ID, user2.ID)
+
+		friendshipHandler := NewFriendshipHandler(db)
+		r := httptest.NewRequest("GET", fmt.Sprintf("/api/v1/users/%d/followees", 10), nil)
+		vars := map[string]string{
+			"id": strconv.FormatInt(10, 10),
+		}
+		r = mux.SetURLVars(r, vars)
+		w := httptest.NewRecorder()
+		status, payload, err := friendshipHandler.ShowFollowees(w, r)
+
+		assert.Equal(t, 404, status)
+		assert.Equal(t, nil, payload)
+		assert.NotEqual(t, nil, err)
+	})
+}
+
+func TestShowFollowers(t *testing.T) {
+	t.Run("ok", func(t *testing.T) {
+		db := models.CreateTestDB()
+		defer models.CleanUpTestDB(db)
+
+		user1, _ := models.CreateUser(db, "alice", "alice@example.com", "password")
+		user2, _ := models.CreateUser(db, "bob", "bob@example.com", "password")
+		models.CreateFollowee(db, user1.ID, user2.ID)
+
+		friendshipHandler := NewFriendshipHandler(db)
+		r := httptest.NewRequest("GET", fmt.Sprintf("/api/v1/users/%d/followers", user2.ID), nil)
+		vars := map[string]string{
+			"id": strconv.FormatInt(user2.ID, 10),
+		}
+		r = mux.SetURLVars(r, vars)
+		w := httptest.NewRecorder()
+		status, payload, err := friendshipHandler.ShowFollowers(w, r)
+
+		assert.Equal(t, 200, status)
+		assert.Equal(t, 1, len(payload.(gen.Followers).Followers))
+		assert.Equal(t, user1.Name, payload.(gen.Followers).Followers[0].Name)
+		assert.Equal(t, nil, err)
+	})
+
+	t.Run("not found", func(t *testing.T) {
+		db := models.CreateTestDB()
+		defer models.CleanUpTestDB(db)
+
+		user1, _ := models.CreateUser(db, "alice", "alice@example.com", "password")
+		user2, _ := models.CreateUser(db, "bob", "bob@example.com", "password")
+		models.CreateFollowee(db, user1.ID, user2.ID)
+
+		friendshipHandler := NewFriendshipHandler(db)
+		r := httptest.NewRequest("GET", fmt.Sprintf("/api/v1/users/%d/followers", 10), nil)
+		vars := map[string]string{
+			"id": strconv.FormatInt(10, 10),
+		}
+		r = mux.SetURLVars(r, vars)
+		w := httptest.NewRecorder()
+		status, payload, err := friendshipHandler.ShowFollowers(w, r)
+
+		assert.Equal(t, 404, status)
+		assert.Equal(t, nil, payload)
+		assert.NotEqual(t, nil, err)
 	})
 }
