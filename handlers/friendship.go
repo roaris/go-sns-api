@@ -47,7 +47,7 @@ func (f *FriendshipHandler) Create(w http.ResponseWriter, r *http.Request) (int,
 		}
 	}
 
-	return http.StatusNoContent, nil, nil
+	return http.StatusCreated, nil, nil
 }
 
 func (f *FriendshipHandler) ShowFollowees(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {

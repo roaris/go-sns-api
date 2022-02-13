@@ -243,8 +243,8 @@ paths:
       summary: ''
       operationId: post-users-user_id-followees
       responses:
-        '204':
-          description: No Content
+        '201':
+          description: Created
         '404':
           description: Not Found
           schema:
