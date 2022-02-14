@@ -18,11 +18,13 @@ type Post struct {
 	UpdatedAt time.Time
 }
 
-func (p *Post) SwaggerModel() *gen.Post {
+func (p *Post) SwaggerModel(isLiked bool, likeNum int64) *gen.Post {
 	return &gen.Post{
 		ID:        p.ID,
 		Content:   p.Content,
 		UserID:    p.UserID,
+		IsLiked:   &isLiked,
+		LikeNum:   &likeNum,
 		CreatedAt: strfmt.DateTime(p.CreatedAt),
 		UpdatedAt: strfmt.DateTime(p.UpdatedAt),
 	}
