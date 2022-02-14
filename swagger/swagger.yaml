@@ -331,6 +331,24 @@ paths:
             properties: {}
       operationId: get-users-user_id-followers
       description: フォローされているユーザー一覧
+  '/posts/{post_id}/likes':
+    parameters:
+      - type: string
+        name: post_id
+        in: path
+        required: true
+    post:
+      summary: ''
+      operationId: post-posts-post_id-likes
+      responses:
+        '201':
+          description: Created
+      tags:
+        - Post
+      description: 投稿にいいねをする
+      parameters: []
+      security:
+        - Authorization: []
 schemes:
   - http
 definitions:
