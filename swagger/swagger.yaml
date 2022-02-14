@@ -349,6 +349,17 @@ paths:
       parameters: []
       security:
         - Authorization: []
+    delete:
+      summary: ''
+      operationId: delete-posts-post_id-likes
+      responses:
+        '200':
+          description: OK
+      description: 投稿へのいいね削除
+      security:
+        - Authorization: []
+      tags:
+        - Post
 schemes:
   - http
 definitions:

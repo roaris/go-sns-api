@@ -39,3 +39,17 @@ func (l *LikeHandler) Create(w http.ResponseWriter, r *http.Request) (int, inter
 	}
 	return http.StatusCreated, nil, nil
 }
+
+func (l *LikeHandler) Destroy(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+	vars := mux.Vars(r)
+	postID, err := strconv.ParseInt(vars["id"], 10, 64)
+	if err != nil {
+		return http.StatusBadRequest, nil, err
+	}
+
+	userID := httputils.GetUserIDFromContext(r.Context())
+	if err = models.DeleteLike(l.db, userID, postID); err != nil {
+		return http.StatusNotFound, nil, err
+	}
+	return http.StatusOK, nil, nil
+}

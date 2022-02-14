@@ -17,3 +17,12 @@ func CreateLike(db *gorm.DB, userID int64, postID int64) error {
 	}).Error
 	return err
 }
+
+func DeleteLike(db *gorm.DB, userID int64, postID int64) error {
+	var like Like
+	if err := db.First(&like, "user_id = ? & post_id = ?", userID, postID).Error; err != nil {
+		return err
+	}
+	db.Delete(&like)
+	return nil
+}
