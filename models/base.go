@@ -30,7 +30,7 @@ func CreateDB() (db *gorm.DB) {
 		log.Fatalln(err)
 	}
 
-	db.AutoMigrate(&User{}, &Post{}, &Friendship{})
+	db.AutoMigrate(&User{}, &Post{}, &Friendship{}, &Like{})
 	return db
 }
 
@@ -53,12 +53,13 @@ func CreateTestDB() (db *gorm.DB) {
 		log.Fatalln(err)
 	}
 
-	db.AutoMigrate(&User{}, &Post{}, &Friendship{})
+	db.AutoMigrate(&User{}, &Post{}, &Friendship{}, &Like{})
 	return db
 }
 
 func CleanUpTestDB(db *gorm.DB) {
 	// 順番に注意!
+	db.Migrator().DropTable(&Like{})
 	db.Migrator().DropTable(&Post{})
 	db.Migrator().DropTable(&Friendship{})
 	db.Migrator().DropTable(&User{})
