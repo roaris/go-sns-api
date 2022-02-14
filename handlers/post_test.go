@@ -24,9 +24,9 @@ func TestCreatePost(t *testing.T) {
 		user, _ := models.CreateUser(db, "taro", "taro@example.com", "password")
 
 		// before
-		var count int
+		var count int64
 		db.Model(&models.Post{}).Count(&count)
-		assert.Equal(t, 0, count)
+		assert.Equal(t, int64(0), count)
 
 		// 投稿作成
 		postHandler := NewPostHandler(db)
@@ -43,7 +43,7 @@ func TestCreatePost(t *testing.T) {
 
 		// after
 		db.Model(&models.Post{}).Count(&count)
-		assert.Equal(t, 1, count)
+		assert.Equal(t, int64(1), count)
 	})
 
 	t.Run("bad request", func(t *testing.T) {
@@ -53,9 +53,9 @@ func TestCreatePost(t *testing.T) {
 		user, _ := models.CreateUser(db, "taro", "taro@example.com", "password")
 
 		// before
-		var count int
+		var count int64
 		db.Model(&models.Post{}).Count(&count)
-		assert.Equal(t, 0, count)
+		assert.Equal(t, int64(0), count)
 
 		// 投稿作成(失敗)
 		postHandler := NewPostHandler(db)
@@ -72,7 +72,7 @@ func TestCreatePost(t *testing.T) {
 
 		// after
 		db.Model(&models.Post{}).Count(&count)
-		assert.Equal(t, 0, count)
+		assert.Equal(t, int64(0), count)
 	})
 }
 
@@ -300,9 +300,9 @@ func TestDestroyPost(t *testing.T) {
 		postHandler := NewPostHandler(db)
 
 		// before
-		var count int
+		var count int64
 		db.Model(&models.Post{}).Count(&count)
-		assert.Equal(t, 1, count)
+		assert.Equal(t, int64(1), count)
 
 		// 削除
 		r := httptest.NewRequest("DELETE", fmt.Sprintf("/api/v1/posts/%d", post.ID), nil)
@@ -320,7 +320,7 @@ func TestDestroyPost(t *testing.T) {
 
 		// after
 		db.Model(&models.Post{}).Count(&count)
-		assert.Equal(t, 0, count)
+		assert.Equal(t, int64(0), count)
 	})
 
 	t.Run("forbidden", func(t *testing.T) {
@@ -334,9 +334,9 @@ func TestDestroyPost(t *testing.T) {
 		postHandler := NewPostHandler(db)
 
 		// before
-		var count int
+		var count int64
 		db.Model(&models.Post{}).Count(&count)
-		assert.Equal(t, 1, count)
+		assert.Equal(t, int64(1), count)
 
 		// 削除
 		r := httptest.NewRequest("DELETE", fmt.Sprintf("/api/v1/posts/%d", post.ID), nil)
@@ -354,6 +354,6 @@ func TestDestroyPost(t *testing.T) {
 
 		// after
 		db.Model(&models.Post{}).Count(&count)
-		assert.Equal(t, 1, count)
+		assert.Equal(t, int64(1), count)
 	})
 }

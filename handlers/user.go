@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/strfmt"
-	"github.com/jinzhu/gorm"
 	"github.com/roaris/go-sns-api/httputils"
 	"github.com/roaris/go-sns-api/swagger/gen"
+	"gorm.io/gorm"
 
 	"github.com/roaris/go-sns-api/models"
 )

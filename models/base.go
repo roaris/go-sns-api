@@ -5,9 +5,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/joho/godotenv"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func CreateDB() (db *gorm.DB) {
@@ -22,16 +23,14 @@ func CreateDB() (db *gorm.DB) {
 	mysqlPort := os.Getenv("MYSQL_PORT")
 	mysqlDatabase := os.Getenv("MYSQL_DATABASE")
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", mysqlUser, mysqlPassword, mysqlHost, mysqlPort, mysqlDatabase)
-	db, err = gorm.Open("mysql", dsn)
+	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	db.LogMode(true)                                                                                                                                                                                                                // ログの出力
-	db.AutoMigrate(&User{})                                                                                                                                                                                                         // usersテーブルの作成
-	db.AutoMigrate(&Post{}).AddForeignKey("user_id", "users(id)", "CASCADE", "RESTRICT")                                                                                                                                            // postsテーブルの作成, 対応するuserが削除されたらpostも削除される(CASCADE), user_idの更新は認めない(RESTRICT)
-	db.AutoMigrate(&Friendship{}).AddForeignKey("followee_id", "users(id)", "CASCADE", "RESTRICT").AddForeignKey("follower_id", "users(id)", "CASCADE", "RESTRICT").AddUniqueIndex("idx_friendships", "follower_id", "followee_id") // friendshipsテーブルの作成
-
+	db.AutoMigrate(&User{}, &Post{}, &Friendship{})
 	return db
 }
 
@@ -47,21 +46,20 @@ func CreateTestDB() (db *gorm.DB) {
 	mysqlPort := os.Getenv("MYSQL_PORT")
 	mysqlDatabase := os.Getenv("MYSQL_TEST_DATABASE")
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", mysqlUser, mysqlPassword, mysqlHost, mysqlPort, mysqlDatabase)
-	db, err = gorm.Open("mysql", dsn)
+	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	db.AutoMigrate(&User{})                                                                                                                                                                                                         // usersテーブルの作成
-	db.AutoMigrate(&Post{}).AddForeignKey("user_id", "users(id)", "CASCADE", "RESTRICT")                                                                                                                                            // postsテーブルの作成, 対応するuserが削除されたらpostも削除される(CASCADE), user_idの更新は認めない(RESTRICT)
-	db.AutoMigrate(&Friendship{}).AddForeignKey("followee_id", "users(id)", "CASCADE", "RESTRICT").AddForeignKey("follower_id", "users(id)", "CASCADE", "RESTRICT").AddUniqueIndex("idx_friendships", "follower_id", "followee_id") // friendshipsテーブルの作成
-
+	db.AutoMigrate(&User{}, &Post{}, &Friendship{})
 	return db
 }
 
 func CleanUpTestDB(db *gorm.DB) {
 	// 順番に注意!
-	db.DropTable(&Post{})
-	db.DropTable(&Friendship{})
-	db.DropTable(&User{})
+	db.Migrator().DropTable(&Post{})
+	db.Migrator().DropTable(&Friendship{})
+	db.Migrator().DropTable(&User{})
 }

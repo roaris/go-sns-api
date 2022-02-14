@@ -5,15 +5,15 @@ import (
 	"time"
 
 	"github.com/go-openapi/strfmt"
-	"github.com/jinzhu/gorm"
 	"github.com/roaris/go-sns-api/swagger/gen"
+	"gorm.io/gorm"
 )
 
 type Post struct {
 	ID        int64
-	Content   string `validate:"required,max=140"`
-	UserID    int64  `validate:"required"`
-	User      *User  `validate:"-"`
+	Content   string
+	UserID    int64
+	User      User `gorm:"constraint:OnUpdate:RESTRICT,OnDelete:CASCADE"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -35,12 +35,12 @@ func GetPost(db *gorm.DB, id int64) (post Post, err error) {
 	}
 	var user User
 	db.Model(&post).Association("User").Find(&user)
-	post.User = &user
+	post.User = user
 	return post, err
 }
 
 // タイムラインの取得
-func GetPosts(db *gorm.DB, userID int64, limit int64, offset int64) (posts []Post) {
+func GetPosts(db *gorm.DB, userID int64, limit int, offset int) (posts []Post) {
 	var friendships []Friendship
 	db.Find(&friendships, "follower_id=?", userID)
 	var followee_ids []int64
@@ -48,7 +48,7 @@ func GetPosts(db *gorm.DB, userID int64, limit int64, offset int64) (posts []Pos
 		followee_ids = append(followee_ids, f.FolloweeID)
 	}
 	// idにはインデックスがついてるので、created_atでソートするよりも高速
-	db.Preload("User").Limit(limit).Offset(offset).Order("id").Find(&posts, "user_id IN (?)", append(followee_ids, userID))
+	db.Preload("User").Limit(limit).Offset(offset).Order("id").Find(&posts, "user_id IN ?", append(followee_ids, userID))
 	return posts
 }
 

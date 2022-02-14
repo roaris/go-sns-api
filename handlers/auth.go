@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/jinzhu/gorm"
 	"github.com/roaris/go-sns-api/models"
 	"github.com/roaris/go-sns-api/swagger/gen"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type AuthHandler struct {

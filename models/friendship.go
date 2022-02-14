@@ -3,13 +3,15 @@ package models
 import (
 	"errors"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type Friendship struct {
 	ID         int64
-	FollowerID int64
-	FolloweeID int64
+	FollowerID int64 `gorm:"index:idx_friendship,unique"`
+	Follower   User  `gorm:"constraint:OnUpdate:RESTRICT,OnDelete:CASCADE"`
+	FolloweeID int64 `gorm:"index:idx_friendship,unique"`
+	Followee   User  `gorm:"constraint:OnUpdate:RESTRICT,OnDelete:CASCADE"`
 }
 
 func CreateFollowee(db *gorm.DB, followerID int64, followeeID int64) error {

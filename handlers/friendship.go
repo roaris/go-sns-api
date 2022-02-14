@@ -6,9 +6,9 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/jinzhu/gorm"
 	"github.com/roaris/go-sns-api/httputils"
 	"github.com/roaris/go-sns-api/models"
+	"gorm.io/gorm"
 
 	"github.com/roaris/go-sns-api/swagger/gen"
 )
