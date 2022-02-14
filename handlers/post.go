@@ -2,15 +2,16 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
 	"github.com/go-openapi/strfmt"
 	"github.com/gorilla/mux"
-	"github.com/jinzhu/gorm"
 	"github.com/roaris/go-sns-api/httputils"
 	"github.com/roaris/go-sns-api/models"
 	"github.com/roaris/go-sns-api/swagger/gen"
+	"gorm.io/gorm"
 )
 
 type PostHandler struct {
@@ -52,7 +53,7 @@ func (p *PostHandler) Show(w http.ResponseWriter, r *http.Request) (int, interfa
 	id, _ := strconv.ParseInt(vars["id"], 10, 64)
 
 	post, err := models.GetPost(p.db, id)
-	if gorm.IsRecordNotFoundError(err) {
+	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return http.StatusNotFound, nil, err
 	}
 
@@ -65,11 +66,11 @@ func (p *PostHandler) Show(w http.ResponseWriter, r *http.Request) (int, interfa
 func (p *PostHandler) Index(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	userID := httputils.GetUserIDFromContext(r.Context())
 	q := r.URL.Query()
-	limit, err := strconv.ParseInt(q["limit"][0], 10, 64)
+	limit, err := strconv.Atoi(q["limit"][0])
 	if err != nil {
 		return http.StatusBadRequest, nil, err
 	}
-	offset, err := strconv.ParseInt(q["offset"][0], 10, 64)
+	offset, err := strconv.Atoi(q["offset"][0])
 	if err != nil {
 		return http.StatusBadRequest, nil, err
 	}
@@ -103,7 +104,7 @@ func (p *PostHandler) Update(w http.ResponseWriter, r *http.Request) (int, inter
 	userID := httputils.GetUserIDFromContext(r.Context())
 	post, err := models.UpdatePost(p.db, id, userID, *updatePostRequest.Content)
 
-	if gorm.IsRecordNotFoundError(err) {
+	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return http.StatusNotFound, nil, err
 	} else if err != nil && err.Error() == "forbidden update" {
 		return http.StatusForbidden, nil, err
@@ -119,7 +120,7 @@ func (p *PostHandler) Destroy(w http.ResponseWriter, r *http.Request) (int, inte
 
 	userID := httputils.GetUserIDFromContext(r.Context())
 	err := models.DeletePost(p.db, id, userID)
-	if gorm.IsRecordNotFoundError(err) {
+	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return http.StatusNotFound, nil, err
 	} else if err != nil && err.Error() == "forbidden delete" {
 		return http.StatusForbidden, nil, err

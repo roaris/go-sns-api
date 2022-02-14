@@ -3,17 +3,16 @@ package models
 import (
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"github.com/roaris/go-sns-api/swagger/gen"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type User struct {
 	ID        int64
 	Name      string
-	Email     string `gorm:"unique_index"`
+	Email     string `gorm:"index:,unique,size:255"`
 	Password  string
-	Posts     []Post
 	CreatedAt time.Time
 }
 
