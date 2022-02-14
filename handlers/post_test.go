@@ -90,8 +90,9 @@ func TestShowPost(t *testing.T) {
 			"id": strconv.FormatInt(post.ID, 10),
 		}
 		r = mux.SetURLVars(r, vars)
+		ctx := httputils.SetUserIDToContext(r.Context(), user.ID)
 		w := httptest.NewRecorder()
-		status, payload, err := postHandler.Show(w, r)
+		status, payload, err := postHandler.Show(w, r.WithContext(ctx))
 
 		assert.Equal(t, 200, status)
 		assert.Equal(t, post.Content, payload.(gen.PostAndUser).Post.Content)
@@ -111,9 +112,10 @@ func TestShowPost(t *testing.T) {
 		vars := map[string]string{
 			"id": strconv.FormatInt(post.ID+1, 10),
 		}
+		ctx := httputils.SetUserIDToContext(r.Context(), user.ID)
 		r = mux.SetURLVars(r, vars)
 		w := httptest.NewRecorder()
-		status, payload, err := postHandler.Show(w, r)
+		status, payload, err := postHandler.Show(w, r.WithContext(ctx))
 
 		assert.Equal(t, 404, status)
 		assert.Equal(t, nil, payload)
@@ -146,8 +148,8 @@ func TestIndexPost(t *testing.T) {
 
 		assert.Equal(t, 200, status)
 		assert.Equal(t, 2, len(payload.(gen.PostsAndUsers).PostsAndUsers))
-		assert.Equal(t, post1.SwaggerModel().Content, payload.(gen.PostsAndUsers).PostsAndUsers[0].Post.Content)
-		assert.Equal(t, post2.SwaggerModel().Content, payload.(gen.PostsAndUsers).PostsAndUsers[1].Post.Content)
+		assert.Equal(t, post1.Content, payload.(gen.PostsAndUsers).PostsAndUsers[0].Post.Content)
+		assert.Equal(t, post2.Content, payload.(gen.PostsAndUsers).PostsAndUsers[1].Post.Content)
 		assert.Equal(t, nil, err)
 	})
 

@@ -43,7 +43,7 @@ func main() {
 
 	authMiddleware := middlewares.AuthMiddleware
 	v1r.Methods(http.MethodPost).Path("/posts").Handler(authMiddleware(AppHandler{postHandler.Create}))
-	v1r.Methods(http.MethodGet).Path("/posts/{id:[0-9]+}").Handler(AppHandler{postHandler.Show})
+	v1r.Methods(http.MethodGet).Path("/posts/{id:[0-9]+}").Handler(authMiddleware(AppHandler{postHandler.Show}))
 	v1r.Methods(http.MethodGet).Path("/posts").Queries("limit", "{limit:[0-9]+}", "offset", "{offset:[0-9]+}").Handler(authMiddleware(AppHandler{postHandler.Index}))
 	v1r.Methods(http.MethodPatch).Path("/posts/{id:[0-9]+}").Handler(authMiddleware(AppHandler{postHandler.Update}))
 	v1r.Methods(http.MethodDelete).Path("/posts/{id:[0-9]+}").Handler(authMiddleware(AppHandler{postHandler.Destroy}))

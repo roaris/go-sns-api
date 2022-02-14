@@ -44,7 +44,7 @@ func (p *PostHandler) Create(w http.ResponseWriter, r *http.Request) (int, inter
 	if err != nil {
 		return http.StatusBadRequest, nil, err
 	}
-	return http.StatusCreated, post.SwaggerModel(), nil
+	return http.StatusCreated, post.SwaggerModel(false, 0), nil
 }
 
 func (p *PostHandler) Show(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
@@ -57,8 +57,10 @@ func (p *PostHandler) Show(w http.ResponseWriter, r *http.Request) (int, interfa
 		return http.StatusNotFound, nil, err
 	}
 
+	userID := httputils.GetUserIDFromContext(r.Context())
+
 	return http.StatusOK, gen.PostAndUser{
-			Post: post.SwaggerModel(),
+			Post: post.SwaggerModel(models.IsLiked(p.db, userID, post.ID), models.GetLikeNum(p.db, post.ID)),
 			User: post.User.SwaggerModel()},
 		nil
 }
@@ -75,9 +77,18 @@ func (p *PostHandler) Index(w http.ResponseWriter, r *http.Request) (int, interf
 		return http.StatusBadRequest, nil, err
 	}
 	posts := models.GetPosts(p.db, userID, limit, offset)
-	var resPostsAndUsers []*gen.PostAndUser
+	var postIDs []int64
 	for _, post := range posts {
-		resPostsAndUsers = append(resPostsAndUsers, &gen.PostAndUser{Post: post.SwaggerModel(), User: post.User.SwaggerModel()})
+		postIDs = append(postIDs, post.ID)
+	}
+	likeFlags := models.BulkIsLiked(p.db, userID, postIDs)
+	likeNums := models.BulkGetLikeNum(p.db, postIDs)
+	var resPostsAndUsers []*gen.PostAndUser
+	for i, post := range posts {
+		resPostsAndUsers = append(resPostsAndUsers, &gen.PostAndUser{
+			Post: post.SwaggerModel(likeFlags[i], likeNums[i]),
+			User: post.User.SwaggerModel(),
+		})
 	}
 	return http.StatusOK, gen.PostsAndUsers{PostsAndUsers: resPostsAndUsers}, nil
 }
@@ -110,7 +121,7 @@ func (p *PostHandler) Update(w http.ResponseWriter, r *http.Request) (int, inter
 		return http.StatusForbidden, nil, err
 	}
 
-	return http.StatusOK, post.SwaggerModel(), nil
+	return http.StatusOK, post.SwaggerModel(models.IsLiked(p.db, userID, post.ID), models.GetLikeNum(p.db, post.ID)), nil
 }
 
 func (p *PostHandler) Destroy(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {

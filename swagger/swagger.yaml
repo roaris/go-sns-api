@@ -33,6 +33,8 @@ paths:
       operationId: get-posts
       description: 投稿取得
       parameters: []
+      security:
+        - Authorization: []
     parameters:
       - type: string
         name: post_id
@@ -379,6 +381,13 @@ definitions:
       updated_at:
         type: string
         format: date-time
+      is_liked:
+        type: boolean
+      like_num:
+        type: integer
+    required:
+      - is_liked
+      - like_num
   User:
     title: User
     type: object

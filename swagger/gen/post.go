@@ -29,6 +29,14 @@ type Post struct {
 	// id
 	ID int64 `json:"id,omitempty"`
 
+	// is liked
+	// Required: true
+	IsLiked *bool `json:"is_liked"`
+
+	// like num
+	// Required: true
+	LikeNum *int64 `json:"like_num"`
+
 	// updated at
 	// Format: date-time
 	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty"`
@@ -42,6 +50,14 @@ func (m *Post) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateCreatedAt(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateIsLiked(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateLikeNum(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -61,6 +77,24 @@ func (m *Post) validateCreatedAt(formats strfmt.Registry) error {
 	}
 
 	if err := validate.FormatOf("created_at", "body", "date-time", m.CreatedAt.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Post) validateIsLiked(formats strfmt.Registry) error {
+
+	if err := validate.Required("is_liked", "body", m.IsLiked); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Post) validateLikeNum(formats strfmt.Registry) error {
+
+	if err := validate.Required("like_num", "body", m.LikeNum); err != nil {
 		return err
 	}
 
