@@ -93,3 +93,87 @@ func TestCreateLike(t *testing.T) {
 		assert.Equal(t, true, *payload.(gen.PostAndUser).Post.IsLiked)
 	})
 }
+
+func TestDestroyLike(t *testing.T) {
+	t.Run("ok", func(t *testing.T) {
+		db := models.CreateTestDB()
+		defer models.CleanUpTestDB(db)
+
+		user1, _ := models.CreateUser(db, "alice", "alice@example.com", "password")
+		user2, _ := models.CreateUser(db, "bob", "bob@example.com", "password")
+		post, _ := models.CreatePost(db, user2.ID, "I'm happy.")
+		models.CreateLike(db, user1.ID, post.ID)
+
+		// before
+		postHandler := NewPostHandler(db)
+		r := httptest.NewRequest("GET", fmt.Sprintf("/api/v1/posts/%d", post.ID), nil)
+		vars := map[string]string{
+			"id": strconv.FormatInt(post.ID, 10),
+		}
+		r = mux.SetURLVars(r, vars)
+		ctx := httputils.SetUserIDToContext(r.Context(), user1.ID)
+		w := httptest.NewRecorder()
+		_, payload, _ := postHandler.Show(w, r.WithContext(ctx))
+
+		assert.Equal(t, int64(1), *payload.(gen.PostAndUser).Post.LikeNum)
+		assert.Equal(t, true, *payload.(gen.PostAndUser).Post.IsLiked)
+
+		// いいね取り消しする
+		likeHandler := NewLikeHandler(db)
+		r = httptest.NewRequest("DELETE", fmt.Sprintf("/api/v1/posts/%d/likes", post.ID), nil)
+		status, payload, err := likeHandler.Destroy(w, r.WithContext(ctx))
+
+		assert.Equal(t, 200, status)
+		assert.Equal(t, nil, payload)
+		assert.Equal(t, nil, err)
+
+		// after
+		r = httptest.NewRequest("GET", fmt.Sprintf("/api/v1/posts/%d", post.ID), nil)
+		_, payload, _ = postHandler.Show(w, r.WithContext(ctx))
+
+		assert.Equal(t, int64(0), *payload.(gen.PostAndUser).Post.LikeNum)
+		assert.Equal(t, false, *payload.(gen.PostAndUser).Post.IsLiked)
+	})
+
+	t.Run("not found", func(t *testing.T) {
+		db := models.CreateTestDB()
+		defer models.CleanUpTestDB(db)
+
+		user1, _ := models.CreateUser(db, "alice", "alice@example.com", "password")
+		user2, _ := models.CreateUser(db, "bob", "bob@example.com", "password")
+		post, err := models.CreatePost(db, user2.ID, "I'm happy.")
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		// before
+		postHandler := NewPostHandler(db)
+		r := httptest.NewRequest("GET", fmt.Sprintf("/api/v1/posts/%d", post.ID), nil)
+		vars := map[string]string{
+			"id": strconv.FormatInt(post.ID, 10),
+		}
+		r = mux.SetURLVars(r, vars)
+		ctx := httputils.SetUserIDToContext(r.Context(), user1.ID)
+		w := httptest.NewRecorder()
+		_, payload, _ := postHandler.Show(w, r.WithContext(ctx))
+
+		assert.Equal(t, int64(0), *payload.(gen.PostAndUser).Post.LikeNum)
+		assert.Equal(t, false, *payload.(gen.PostAndUser).Post.IsLiked)
+
+		// いいね取り消しする(いいねしていないので失敗)
+		likeHandler := NewLikeHandler(db)
+		r = httptest.NewRequest("DELETE", fmt.Sprintf("/api/v1/posts/%d/likes", post.ID), nil)
+		status, payload, err := likeHandler.Destroy(w, r.WithContext(ctx))
+
+		assert.Equal(t, 404, status)
+		assert.Equal(t, nil, payload)
+		assert.NotEqual(t, nil, err)
+
+		// after
+		r = httptest.NewRequest("GET", fmt.Sprintf("/api/v1/posts/%d", post.ID), nil)
+		_, payload, _ = postHandler.Show(w, r.WithContext(ctx))
+
+		assert.Equal(t, int64(0), *payload.(gen.PostAndUser).Post.LikeNum)
+		assert.Equal(t, false, *payload.(gen.PostAndUser).Post.IsLiked)
+	})
+}
