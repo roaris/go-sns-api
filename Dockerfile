@@ -1,4 +1,4 @@
-FROM golang:alpine
+FROM golang:1.21.1-alpine3.18
 
 RUN apk update && apk add git
 
@@ -9,5 +9,5 @@ WORKDIR /app
 COPY * ./
 
 # airを使ってホットリロード
-RUN go get -u github.com/cosmtrek/air
+RUN go install github.com/cosmtrek/air@v1.45.0
 CMD ["air", "-c", ".air.toml"]
