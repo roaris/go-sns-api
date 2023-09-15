@@ -4,7 +4,7 @@ services:
     build: .
     tty: true
     ports:
-      - "8080:8080"
+      - "8000:8000"
     environment:
       - CGO_ENABLED=0
     volumes:
@@ -27,7 +27,7 @@ services:
     environment:
       - SWAGGER_JSON=/swagger/swagger.yaml
     ports:
-      - "8081:8080"
+      - "8001:8080"
     volumes:
       - ./swagger:/swagger
 

@@ -17,18 +17,16 @@ docker-compose build
 docker-compose up
 ```
 
-APIサーバー: [localhost:8080](http://localhost:8080)
+APIサーバー: [localhost:8000](http://localhost:8000)
 
-Swagger: [localhost:8081](http://localhost:8081)
+Swagger: [localhost:8001](http://localhost:8001)
 
 ハンドラのテスト: `docker-compose exec app go test ./handlers`
 
 検証が終わったら、`docker-compose down`
 
-## 本番環境
-デプロイ先: https://go-sns-api.herokuapp.com/
 ```
-$ curl https://go-sns-api.herokuapp.com/ping
+$ curl http://localhost:8000/ping
 pong
 ```
 
